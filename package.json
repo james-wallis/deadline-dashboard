@@ -1,0 +1,27 @@
+{
+  "name": "deadline-dashboard",
+  "version": "1.0.0",
+  "description": "A configurable dashboard for my WebScript coursework.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesemwallis/deadline-dashboard.git"
+  },
+  "keywords": [
+    "WebScript",
+    "Dashboard"
+  ],
+  "author": "James Wallis mail@james-wallis.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamesemwallis/deadline-dashboard/issues"
+  },
+  "homepage": "https://github.com/jamesemwallis/deadline-dashboard#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
