@@ -32,6 +32,10 @@
 }
 body {
   height: 100vh;
+  overflow: hidden;
+}
+p {
+  text-align: center;
 }
 #container {
   height: 100%;
@@ -65,12 +69,6 @@ body {
   -moz-box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.4);
   box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.4);
 }
-.quarter-box {
-  display: inline-block;
-  width: 49%;
-  height: 49%;
-  border: 1px solid red;
-}
 .datetime {
   color: #868784;
 }
@@ -93,7 +91,19 @@ h1 {
 }
 h2 {
   font-size: 30px;
+  color: #D2D4C8;
+}
+#all-deadlines-button {
+  text-decoration: none;
   color: #868784;
+  transition: color 0.3s;
+}
+#all-deadlines-button:hover {
+  color: #D2D4C8;
+  transition: color 0.3s;
+}
+#all-deadlines-button p{
+  text-align: center;
 }
 #deadline-container {
   /*height: 80%;*/
@@ -101,6 +111,7 @@ h2 {
 .deadline {
   text-align: center;
   margin: 25px 10px;
+  padding: 10px;
   border: 1px solid black;
   height: 18vh;
   background-color: #F2C57C;
@@ -108,20 +119,160 @@ h2 {
 .deadline:last-child {
   margin-bottom: 0;
 }
-
-
-
-
-
-
-
-
-/* OLD DEADLINES */
-
-
-/*main {
-  height: 90%;
+.deadline h3 {
+  padding: 5px;
+  font-weight: lighter;
+  font-size: 20px;
 }
-.row {
-  height: 25%;
-}*/
+.deadline p {
+  padding: 3px;
+}
+
+/* Individual Styles for each unit */
+/* NOT USED AS DIFFERENT WAY TO STYLE DEADLINES */
+#mathfun {
+  background-color: #EEEBD0;
+}
+#webscript {
+  background-color: #C6D4FF;
+}
+#dsalg {
+  background-color: #F06543;
+}
+#cosine {
+  background-color: #869D7A;
+}
+#adproc {
+  background-color: #ABE188;
+}
+#inse {
+  background-color: #F2C57C;
+}
+#other {
+  background-color: #FBFBFB;
+}
+
+
+
+
+
+/* Styling for the settings menu */
+#settings-icon {
+  width: 10px;
+  height: 100%;
+  position: absolute;
+  background-color: #1B1B1B;
+  color: #868784;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+#settings-icon:hover {
+  background-color: #D2D4C8;
+  color: #1B1B1E;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+#settings-container {
+  height: 100%;
+  width: 100%;
+  /*background-color: #212227;*/
+  position: absolute;
+  top: 0;
+  left:100vw;
+  transition: left 0.3s;
+}
+#settings-dashboard, #settings-deadlines {
+  background-color: #F8F4E3;
+  height: 100%;
+  transition: opacity 0.5s;
+}
+#settings-dashboard h2, #settings-deadlines h2 {
+  color: #212227;
+}
+.switchSide, .closeSettings {
+  color: grey;
+  text-align: center;
+  padding: 5px;
+  cursor: pointer;
+}
+.deadline-settings {
+  text-align: center;
+  margin-top: 20px;
+  border-right: 1px solid #e1d084;
+  min-height: 75%;
+}
+.deadline-settings:last-child {
+  border: 0;
+}
+.deadline-settings p {
+  text-align: justify;
+  font-size: 14px;
+  padding-top: 5px;
+  color: #868784;
+}
+.deadline-settings form {
+  margin-bottom: 10px;
+}
+#settings-dashboard {
+  opacity: 0;
+}
+#settings-deadlines {
+  border-left: 2px solid #868784;
+}
+.add-deadline-form {
+  display: block;
+  text-align: center;
+}
+.add-deadline-form label, .add-deadline-form input {
+  display: block;
+  margin: 0 auto;
+  margin-top: 10px;
+  text-align: center;
+}
+#add-unit {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e1d084;
+}
+
+
+
+
+
+
+
+
+#all-deadlines-menu {
+  border-left: 2px solid #868784;
+  height: 100%;
+}
+#all-deadlines-menu a {
+  text-decoration: none;
+  padding: 20px 5px;
+  color: #868784;
+  transition: color 0.3s;
+}
+#all-deadlines-menu a:hover {
+  color: #D2D4C8;
+  transition: color 0.3s;
+}
+#all-deadlines-menu a p {
+  text-align: center;
+  font-size: 20px;
+}
+.sort-deadlines {
+  text-align: center;
+}
+.sort-deadlines h3 {
+  text-align: center;
+  padding: 10px;
+  color: #868784;
+}
+.sort-deadlines select {
+  text-align: center;
+}

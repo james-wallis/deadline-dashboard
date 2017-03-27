@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Deadlines</title>
+    <title>Dashboard</title>
     <link href="dashboard-stylesheet.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
  </head>
   <body>
     <div id="container">
-
       <main class="col-10">
-        <!-- Uncomment once grid is done -->
-        <!-- <header>
-          <h1>Good Morning, James</h1>
-          <p>It is <span class="datetime">11:00 AM</span></p>
-          <p>On <span class="datetime">Monday</span> the <span class="datetime">25th July</span></p>
-        </header> -->
         <div class="col-6 dashboard-outer-box">
           <div class="dashboard-inner-box">
 
@@ -26,16 +21,6 @@
 
           </div>
         </div>
-        <!-- <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
-
-          </div>
-        </div>
-        <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
-
-          </div>
-        </div> -->
         <div class="col-3 dashboard-outer-box">
           <div class="dashboard-inner-box">
 
@@ -43,22 +28,10 @@
         </div>
         <div id="dashboard-welcome-container" class="col-6 dashboard-outer-box">
           <div id="dashboard-welcome">
-            <h1>Good Morning, James</h1>
-            <p>It is <span class="datetime">11:00 AM</span></p>
-            <p>On <span class="datetime">Monday</span> the <span class="datetime">25th July</span></p>
-          </div>
-        </div>
-        <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
-
-          </div>
-        </div>
-        <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
-            <!-- <div class="quarter-box"></div>
-            <div class="quarter-box"></div>
-            <div class="quarter-box"></div>
-            <div class="quarter-box"></div> -->
+            <h1><span id="timeOfDay"></span>, James</h1>
+            <p>It is <span id="currentTime" class="datetime"></span></p>
+            <p>On <span id="dayOfTheWeek" class="datetime"></span> the <span id="dateMonth" class="datetime"></span></p>
+            <p>Also known as <span class="datetime">Mothers Day</span></p>
           </div>
         </div>
         <div class="col-3 dashboard-outer-box">
@@ -76,34 +49,106 @@
 
           </div>
         </div>
+        <div class="col-3 dashboard-outer-box">
+          <div class="dashboard-inner-box">
 
+          </div>
+        </div>
+        <div class="col-3 dashboard-outer-box">
+          <div class="dashboard-inner-box">
 
+          </div>
+        </div>
       </main>
       <aside class="col-2">
         <h2>Upcoming Deadlines</h2>
+        <a id="all-deadlines-button" href="/deadlines"><p>View all Deadlines</p></a>
         <div id="deadline-container">
-          <div class="deadline" style="background-color: #C6D4FF">
-            <h3>INSE</h3>
-            <p>Final Report and Application</p>
-            <p>Friday, 28/04/17</p>
-          </div>
-          <div class="deadline">
-            <h3>INSE</h3>
-            <p>Final Report and Application</p>
-            <p>Friday, 28/04/17</p>
-          </div>
-          <div class="deadline" style="background-color: #C6D4FF">
-            <h3>INSE</h3>
-            <p>Final Report and Application</p>
-            <p>Friday, 28/04/17</p>
-          </div>
-          <div class="deadline">
-            <h3>INSE</h3>
-            <p>Final Report and Application</p>
-            <p>Friday, 28/04/17</p>
-          </div>
+          <!-- Deadlines go here -->
         </div>
       </aside>
+    </div> <!-- CONTAINER END -->
+    <!-- Icon for the settings menu -->
+    <div id="settings-icon"><i class="material-icons">chevron_left</i></div>
+    <div id="settings-container">
+      <div id="settings-dashboard" class="col-10">
+        <h2>Deadline Settings</h2>
+        <!-- <p class="switchSide">Switch to Dashboard Settings</p>
+        <p class="closeSettings">Close Settings</p> -->
+        <p>
+          <span class="switchSide">Switch to Dashboard Settings</span>
+           |
+          <span class="closeSettings">Close Settings</span>
+        </p>
+        <div class="col-3 deadline-settings">
+          <h3>Add a Deadline</h3>
+          <p>To add a new deadline, enter the unit short code using the drop
+            down menu, the description of the deadline and finally the date
+            that the deadline is due.</p>
+          <form action="/api/deadlines" method="post">
+            <div class="add-deadline-form">
+              <label for="title">Unit</label>
+              <select class="" name="title">
+                <option disabled selected hidden>Select a Unit</option>
+                <option value="webscript">WebScript</option>
+                <option value="inse">INSE</option>
+                <option value="mathfun">MathFun</option>
+                <option value="adproc">AdProc</option>
+                <option value="dsalg">DSALG</option>
+                <option value="cosine">COSINE</option>
+              </select>
+            </div>
+            <div class="add-deadline-form">
+              <label for="description">Description</label>
+              <input type="text" name="description" value="" placeholder="Deadline Description">
+            </div>
+            <div class="add-deadline-form">
+              <label for="date">Due Date</label>
+              <input type="date" name="date" value="" placeholder="">
+            </div>
+            <input type="submit" name="submit" value="Add Deadline">
+          </form>
+          <p>Note: If you need to create a new deadline for a unit which has
+            not been entered into the database, please used the add unit for
+            below.</p>
+          <div id="add-unit">
+            <h4>Add Unit</h4>
+            <form class="" action="" method="post">
+              <div class="add-deadline-form">
+                <label for="addUnit">Unit Shortcode</label>
+                <input type="text" name="addUnitShortcode" value="" placeholder="Unit Shortcode">
+              </div>
+              <div class="add-deadline-form">
+                <label for="addUnit">Unit Full Name</label>
+                <input type="text" name="addUnitLongcode" value="" placeholder="Unit Fullname">
+              </div>
+              <div class="add-deadline-form">
+                <label for="addUnit">Unit Background Colour</label>
+                <input type="text" name="addUnitColour" value="#" placeholder="Unit Background Colour">
+              </div>
+              <input type="button" name="submit" value="Add Subject">
+            </form>
+          </div>
+        </div>
+        <div class="col-3 deadline-settings">
+          <h3>Remove a Deadline</h3>
+        </div>
+        <div class="col-3 deadline-settings">
+          <h3>Edit a Deadline</h3>
+        </div>
+        <div class="col-3 deadline-settings">
+          <h3>Change Deadline Settings</h3>
+        </div>
+      </div>
+      <div id="settings-deadlines" class="col-2">
+        <h2>Dashboard Quick Settings</h2>
+        <p class="switchSide">Switch to Deadline Settings</p>
+        <p class="closeSettings">Close Settings</p>
+        <p>Full Settings</p>
+      </div>
     </div>
   </body>
+  <script src="dashboard.js"></script>
+  <script src="deadlines.js"></script>
+  <script src="settingsmenu.js"></script>
 </html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dashboard</title>
+    <link href="dashboard-stylesheet.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+ </head>
+  <body>
+    <div id="container">
+      <div class="col-12">
+        <h1>All Deadlines</h1>
+      </div>
+      <div id="deadline-container" class="col-10">
+        <!-- All deadlines go here -->
+      </div>
+      <div class="col-2" id="all-deadlines-menu">
+        <h2>Menu</h2>
+        <a href="/"><p>Return to Dashboard</p></a>
+        <div class="sort-deadlines">
+          <h3>Order By</h3>
+          <select id="sort-deadlines">
+            <option value="near">Nearest First</option>
+            <option value="far">Furthest Away First</option>
+            <option value="a2z">Subject A-Z</option>
+            <option value="z2a">Subject Z-A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="deadlines.js"></script>
+</html>
