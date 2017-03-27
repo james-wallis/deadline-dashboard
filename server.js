@@ -14,7 +14,8 @@ var app = express();
 // constants for directories
 var webpages = __dirname + '/webpages/';
 
-
+// static files
+app.use('/', express.static(webpages, { extensions: ['html'] }));
 
 
 
@@ -52,8 +53,7 @@ app.get('/api/units', sendUnits);
 // app.delete('/api/deadlines/:id', deleteDeadline);
 
 
-// static files
-app.use('/', express.static(webpages, { extensions: ['html'] }));
+
 
 // start the server
 app.listen(8080);
@@ -117,7 +117,7 @@ app.listen(8080);
      dueDate: req.body.date
    };
    sql.query(sql.format('INSERT INTO deadlines SET ?', dbRecord), function (err, result) {
-     if (err) return error(res, 'failed sql insert', err);
+     if (err) console.log("Error inserting");
 
      if (req.accepts('html')) {
        // browser should go to the listing of pictures

@@ -1,7 +1,38 @@
 //Event Listeners
 'use strict';
 window.addEventListener('load', loadDeadlines);
+document.getElementById('addDeadlineForm').addEventListener("submit", submitAddDeadlineForm);
+// var myForm = document.forms["addDeadlineForm"];
 
+
+// myForm.onsubmit = function(event){
+function submitAddDeadlineForm(e) {
+  e.preventDefault();
+  var addTitle = document.getElementById('add-deadline-title'),
+      addDesc = document.getElementById('add-deadline-description'),
+      addDate = document.getElementById('add-deadline-date');
+  var url = '/api/deadlines';
+  var http = new XMLHttpRequest();
+  http.open('POST', url, true);
+  http.setRequestHeader('Content-Type','application/json');
+  http.onload = function() {
+    if (http.status == 200) {
+      swal("Deadline Added!", "Your new deadline has been successfully added.",
+            "success");
+      console.log("Status is 200");
+      loadDeadlines();
+      addTitle.value = "Select a Unit";
+      addDesc.value = "";
+      addDate.value = "";
+    }
+  };
+  http.send(JSON.stringify(  {
+      title: addTitle.value,
+      description: addDesc.value,
+      date: addDate.value
+    }
+));
+}
 /**
  * Function to load the deadlines onto the dashboard
  * Sends the parsed response text to the function loadUnitsWithDeadlines
@@ -131,7 +162,7 @@ function getDeadlineID(title) {
 function datetimeToString(datetime) {
   var d = new Date(datetime);
   var day = d.getDate();
-  var month = d.getMonth();
+  var month = d.getMonth()+1;
   var year = d.getFullYear();
   if (day < 10) day = ('0'+day);
   if (month < 10) month = ('0'+month);

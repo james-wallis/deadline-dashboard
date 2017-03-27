@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
+    <!-- Direct link not working, use CDN instead -->
+    <!-- <link rel="stylesheet" href="node_modules/sweetalert/dist/sweetalert.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">
  </head>
   <body>
     <div id="container">
@@ -85,10 +88,10 @@
           <p>To add a new deadline, enter the unit short code using the drop
             down menu, the description of the deadline and finally the date
             that the deadline is due.</p>
-          <form action="/api/deadlines" method="post">
+          <form id="addDeadlineForm" action="/api/deadlines" method="post">
             <div class="add-deadline-form">
               <label for="title">Unit</label>
-              <select class="" name="title">
+              <select id="add-deadline-title" class="" name="title">
                 <option disabled selected hidden>Select a Unit</option>
                 <option value="webscript">WebScript</option>
                 <option value="inse">INSE</option>
@@ -100,11 +103,11 @@
             </div>
             <div class="add-deadline-form">
               <label for="description">Description</label>
-              <input type="text" name="description" value="" placeholder="Deadline Description">
+              <input id="add-deadline-description" type="text" name="description" value="" placeholder="Deadline Description">
             </div>
             <div class="add-deadline-form">
               <label for="date">Due Date</label>
-              <input type="date" name="date" value="" placeholder="">
+              <input id="add-deadline-date" type="date" name="date" value="" placeholder="">
             </div>
             <input type="submit" name="submit" value="Add Deadline">
           </form>
@@ -151,4 +154,7 @@
   <script src="dashboard.js"></script>
   <script src="deadlines.js"></script>
   <script src="settingsmenu.js"></script>
+  <!-- Direct link not working, use CDN instead -->
+  <!-- <script src="../node_modules/sweetalert/dist/sweetalert.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 </html>

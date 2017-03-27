@@ -41,6 +41,9 @@ p {
   height: 100%;
   background-color: #212227;
 }
+main, aside {
+  background-color: #212227;
+}
 #dashboard-welcome-container {
   display: flex;
   align-items: center;
