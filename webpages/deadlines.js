@@ -1,38 +1,17 @@
 //Event Listeners
 'use strict';
 window.addEventListener('load', loadDeadlines);
-document.getElementById('addDeadlineForm').addEventListener("submit", submitAddDeadlineForm);
-// var myForm = document.forms["addDeadlineForm"];
-
-
-// myForm.onsubmit = function(event){
-function submitAddDeadlineForm(e) {
-  e.preventDefault();
-  var addTitle = document.getElementById('add-deadline-title'),
-      addDesc = document.getElementById('add-deadline-description'),
-      addDate = document.getElementById('add-deadline-date');
-  var url = '/api/deadlines';
-  var http = new XMLHttpRequest();
-  http.open('POST', url, true);
-  http.setRequestHeader('Content-Type','application/json');
-  http.onload = function() {
-    if (http.status == 200) {
-      swal("Deadline Added!", "Your new deadline has been successfully added.",
-            "success");
-      console.log("Status is 200");
-      loadDeadlines();
-      addTitle.value = "Select a Unit";
-      addDesc.value = "";
-      addDate.value = "";
-    }
-  };
-  http.send(JSON.stringify(  {
-      title: addTitle.value,
-      description: addDesc.value,
-      date: addDate.value
-    }
-));
+//Event Listeners for the main dashboard page only
+if(window.location.href.indexOf("deadlines") == -1) {
+  document.getElementById('addDeadlineForm').addEventListener("submit", submitAddDeadlineForm);
+  document.getElementById('addUnitForm').addEventListener("submit", submitAddUnitForm);
+} else {
+  document.getElementById('sort-deadlines').addEventListener("change", loadDeadlines);
 }
+
+//Global Variables
+
+
 /**
  * Function to load the deadlines onto the dashboard
  * Sends the parsed response text to the function loadUnitsWithDeadlines
@@ -45,7 +24,7 @@ function loadDeadlines() {
   if(window.location.href.indexOf("deadlines") == -1) {
     url += '?limit=' + 4;
   }
-  //url += '?order=' + window.sort.selectedOptions[0].value;
+  url += '?order=' + document.getElementById('sort-deadlines').value;
   //if (currentSearch) url += '&title=' + encodeURIComponent(currentSearch);
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
@@ -140,24 +119,69 @@ function findColour(unit, element, array) {
   return unit.shortCode == this;
 }
 
-function getDeadlineID(title) {
-  switch(title.toLowerCase()) {
-    case 'mathfun':
-      return 'mathfun';
-    case 'webscript':
-      return 'webscript';
-    case 'dsalg':
-      return 'dsalg';
-    case 'cosine':
-      return 'cosine';
-    case 'adproc':
-      return 'adproc';
-    case 'inse':
-      return 'inse';
-    default:
-      return 'other';
+/**
+ * Function to submit the add Deadline form and add a new deadline to the database
+ */
+function submitAddDeadlineForm(e) {
+  e.preventDefault();
+  var addTitle = document.getElementById('add-deadline-title'),
+      addDesc = document.getElementById('add-deadline-description'),
+      addDate = document.getElementById('add-deadline-date');
+  if (addTitle.value != "" && addTitle.value != "Select a Unit" && addDesc.value != "" && addDate.value != "") {
+    var url = '/api/deadlines';
+    var http = new XMLHttpRequest();
+    http.open('POST', url, true);
+    http.setRequestHeader('Content-Type','application/json');
+    http.onload = function() {
+      if (http.status == 200) {
+        swal("Deadline Added!", "Your new deadline has been successfully added.",
+              "success");
+        console.log("Status is 200");
+        loadDeadlines();
+        addTitle.value = "Select a Unit";
+        addDesc.value = "";
+        addDate.value = "";
+      }
+    };
+    http.send(JSON.stringify(  {
+        title: addTitle.value,
+        description: addDesc.value,
+        date: addDate.value
+      }
+  ));
   }
 }
+
+function submitAddUnitForm(e) {
+  e.preventDefault();
+  var addUnitShortCode = document.getElementById('addUnitShortcode'),
+      addUnitLongName = document.getElementById('addUnitLongcode'),
+      addUnitColour = document.getElementById('addUnitColour');
+      console.log("function run");
+  if (addUnitShortCode.value != "" && addUnitLongName.value != "" && addUnitColour.value != "") {
+    var url = '/api/units';
+    var http = new XMLHttpRequest();
+    http.open('POST', url, true);
+    http.setRequestHeader('Content-Type','application/json');
+    http.onload = function() {
+      if (http.status == 200) {
+        swal("Unit Added!", "Your new unit has been successfully added.",
+              "success");
+        console.log("Status is 200");
+        addUnitShortCode.value = "";
+        addUnitLongName.value = "";
+        addUnitColour.value = "";
+      }
+    };
+    http.send(JSON.stringify(  {
+        unitShortCode: addUnitShortCode.value,
+        unitLongName: addUnitLongName.value,
+        unitColour: addUnitColour.value
+      }
+  ));
+  }
+}
+
 
 function datetimeToString(datetime) {
   var d = new Date(datetime);

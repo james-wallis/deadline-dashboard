@@ -116,20 +116,20 @@
             below.</p>
           <div id="add-unit">
             <h4>Add Unit</h4>
-            <form class="" action="" method="post">
+            <form id="addUnitForm" action="/api/units" method="post">
               <div class="add-deadline-form">
                 <label for="addUnit">Unit Shortcode</label>
-                <input type="text" name="addUnitShortcode" value="" placeholder="Unit Shortcode">
+                <input type="text" name="addUnitShortcode" id="addUnitShortcode" value="" placeholder="Unit Shortcode">
               </div>
               <div class="add-deadline-form">
                 <label for="addUnit">Unit Full Name</label>
-                <input type="text" name="addUnitLongcode" value="" placeholder="Unit Fullname">
+                <input type="text" name="addUnitLongcode" id="addUnitLongcode" value="" placeholder="Unit Fullname">
               </div>
               <div class="add-deadline-form">
                 <label for="addUnit">Unit Background Colour</label>
-                <input type="text" name="addUnitColour" value="#" placeholder="Unit Background Colour">
+                <input type="text" name="addUnitColour" id="addUnitColour" value="#" placeholder="Unit Colour">
               </div>
-              <input type="button" name="submit" value="Add Subject">
+              <input type="submit" name="submit" value="Add Subject">
             </form>
           </div>
         </div>

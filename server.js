@@ -50,6 +50,7 @@ app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.
 app.get('/api/deadlines', sendDeadlines);
 app.post('/api/deadlines', uploadDeadline);
 app.get('/api/units', sendUnits);
+app.post('/api/units', uploadUnit);
 // app.delete('/api/deadlines/:id', deleteDeadline);
 
 
@@ -82,9 +83,18 @@ app.listen(8080);
    if (req.query.title) {
      query += ' WHERE title LIKE ' + sql.escape('%' + req.query.title + '%');
    }
+
    //Where ensures that we do not see past deadlines
    query += ' WHERE dueDate >= CURRENT_DATE()';
-   query += ' ORDER BY dueDate ASC';
+   var sort;
+   switch (req.query.order) {
+     case 'near': sort = 'dueDate ASC'; break; // by nearest date
+     case 'far': sort = 'dueDate DESC'; break; // by furthest away date
+     case 'a2z': sort = 'title ASC'; break; // by unit title a to z
+     case 'z2a': sort = 'title DESC'; break; // by unit title z to a
+     default:    sort = 'dueDate ASC'; // Default with nearest date
+   }
+   query += ' ORDER BY ' + sort;
    //Add limit to query
    if (req.query.limit) {
      query += ' LIMIT '+ escape(req.query.limit);
@@ -120,9 +130,10 @@ app.listen(8080);
      if (err) console.log("Error inserting");
 
      if (req.accepts('html')) {
-       // browser should go to the listing of pictures
+       // browser should go to the listing of deadlines
        res.redirect(303, '/#' + result.insertId);
      } else {
+       res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
        // XML HTTP request that accepts JSON will instead get that
        res.json({id: result.insertedId, title: dbRecord.title, description: dbRecord.description, dueDate: dbRecord.dueDate});
      }
@@ -146,5 +157,30 @@ app.listen(8080);
        });
      });
      res.json(units);
+   });
+ }
+
+
+ function uploadUnit(req, res) {
+   console.log(req.body.unitShortCode);
+   console.log(req.body.unitLongName);
+   console.log(req.body.unitColour);
+   //Add unit to the database
+   var dbRecord = {
+     unitShortCode: req.body.unitShortCode,
+     unitLongName: req.body.unitLongName,
+     unitColour: req.body.unitColour
+   };
+   sql.query(sql.format('INSERT INTO units SET ?', dbRecord), function (err, result) {
+     if (err) console.log("Error inserting");
+
+     if (req.accepts('html')) {
+       // browser should go to the listing of units
+       res.redirect(303, '/#' + result.insertId);
+     } else {
+       res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
+       // XML HTTP request that accepts JSON will instead get that
+       res.json({id: result.insertedId, unitShortCode: dbRecord.unitShortCode, unitLongName: dbRecord.unitLongName, unitColour: dbRecord.unitColour});
+     }
    });
  }
