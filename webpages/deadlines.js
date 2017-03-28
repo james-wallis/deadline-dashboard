@@ -23,8 +23,9 @@ function loadDeadlines() {
   //If page is not deadlines, limit to 4
   if(window.location.href.indexOf("deadlines") == -1) {
     url += '?limit=' + 4;
+  } else {
+    url += '?order=' + document.getElementById('sort-deadlines').value;
   }
-  url += '?order=' + document.getElementById('sort-deadlines').value;
   //if (currentSearch) url += '&title=' + encodeURIComponent(currentSearch);
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
