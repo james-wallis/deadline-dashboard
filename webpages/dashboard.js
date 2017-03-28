@@ -1,12 +1,18 @@
 window.addEventListener('load', updateDateTime, true);
 
+var timerSet = false;
+
 function updateDateTime() {
   var date = new Date();
   showCurrentTime(date);
   showTimeOfDay(date);
   showDayOfTheWeek(date);
   showDateMonth(date);
-  setInterval(updateDateTime, 1000);
+  if (!timerSet) {
+    setInterval(updateDateTime, 1000);
+    timerSet = true;
+  }
+  console.log("shit");
 }
 function showCurrentTime(date) {
     var hours = date.getHours();
