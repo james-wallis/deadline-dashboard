@@ -12,7 +12,6 @@ function updateDateTime() {
     setInterval(updateDateTime, 1000);
     timerSet = true;
   }
-  console.log("shit");
 }
 function showCurrentTime(date) {
     var hours = date.getHours();

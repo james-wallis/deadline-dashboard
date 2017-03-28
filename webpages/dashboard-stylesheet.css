@@ -32,7 +32,8 @@
 }
 body {
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  /*overflow: hidden;*/
 }
 p {
   text-align: center;
@@ -191,7 +192,7 @@ h2 {
   transition: left 0.3s;
 }
 #settings-dashboard, #settings-deadlines {
-  background-color: #F8F4E3;
+  background-color: #fdfcf7;
   height: 100%;
   transition: opacity 0.5s;
 }
@@ -207,7 +208,7 @@ h2 {
 .deadline-settings {
   text-align: center;
   margin-top: 20px;
-  border-right: 1px solid #e1d084;
+  border-right: 1px solid #D2D4C8;
   min-height: 75%;
 }
 .deadline-settings:last-child {
@@ -228,20 +229,24 @@ h2 {
 #settings-deadlines {
   border-left: 2px solid #868784;
 }
-.add-deadline-form {
+.add-deadline-form, .remove-deadline-form {
   display: block;
   text-align: center;
 }
-.add-deadline-form label, .add-deadline-form input {
+.add-deadline-form label, .add-deadline-form input,
+.remove-deadline-form label, .remove-deadline-form input {
   display: block;
   margin: 0 auto;
   margin-top: 10px;
   text-align: center;
 }
+.remove-deadline-form label, .remove-deadline-form select {
+  margin: 10px;
+}
 #add-unit {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #e1d084;
+  border-top: 1px solid #D2D4C8;
 }
 
 
