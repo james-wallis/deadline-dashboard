@@ -304,6 +304,10 @@ main h4 {
   padding: 1% 0;
   text-align: center;
   color: #868784;
+  border-bottom: 1px dotted #3F4045;
+}
+.news-div p:last-child {
+  border: 0;
 }
 
 #last-fm-div {
