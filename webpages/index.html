@@ -14,18 +14,28 @@
   <body>
     <div id="container">
       <main class="col-10">
-        <div class="col-6 dashboard-outer-box">
-          <div class="dashboard-inner-box">
-
-          </div>
-        </div>
-        <div class="col-6 dashboard-outer-box">
-          <div class="dashboard-inner-box">
+        <div class="col-3 dashboard-outer-box">
+          <div id="weather-div" class="dashboard-inner-box">
 
           </div>
         </div>
         <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
+          <div id="fourfourtwo-news-div" class="dashboard-inner-box">
+
+          </div>
+        </div>
+        <div class="col-3 dashboard-outer-box">
+          <div id="guardian-news-div" class="dashboard-inner-box">
+
+          </div>
+        </div>
+        <div class="col-3 dashboard-outer-box">
+          <div id="tech-crunch-div" class="dashboard-inner-box">
+
+          </div>
+        </div>
+        <div class="col-3 dashboard-outer-box">
+          <div id="quote-div" class="dashboard-inner-box">
 
           </div>
         </div>
@@ -37,12 +47,12 @@
           </div>
         </div>
         <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
+          <div id="last-fm-div" class="dashboard-inner-box">
 
           </div>
         </div>
         <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
+          <div id="bbc-news-div" class="dashboard-inner-box">
 
           </div>
         </div>
@@ -105,8 +115,8 @@
             <input type="submit" name="submit" value="Add Deadline">
           </form>
           <p>Note: If you need to create a new deadline for a unit which has
-            not been entered into the database, please used the add unit for
-            below.</p>
+            not been entered into the database, please add a unit using the
+            form below.</p>
           <div id="add-unit">
             <h4>Add Unit</h4>
             <form id="addUnitForm" action="/api/units" method="post">

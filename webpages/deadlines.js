@@ -93,6 +93,9 @@ function addDeadlinesToPage(units, deadlines) {
   // Doesn't use deadlines.forEach as the whole deadline table
   // is needed for delete
   var deadlinesAdded = 0;
+  if (deadlinePage || deadlines.length<4) {
+    amountToShow = deadlines.length;
+  }
   while (deadlinesAdded < amountToShow) {
     var deadline = deadlines[deadlinesAdded];
     // Set default deadline colour
@@ -172,8 +175,17 @@ function addUnitSelectToPage(units) {
    deadlines.forEach(function (deadline) {
      option = document.createElement('option');
      option.value = deadline.id;
+     var fullDescription = deadline.description;
+     var length = 6;
+     var desc = '';
+     if (fullDescription.length > length) {
+       desc = fullDescription.substring(0, length)+'...';
+     } else {
+       desc = fullDescription;
+     }
      var date = datetimeToString(deadline.dueDate);
-     option.textContent = ((deadline.title).toUpperCase() + " | " + date);
+     option.textContent = ((deadline.title).toUpperCase() + " | " +
+                          desc + ' | '+ date);
      select.appendChild(option);
    });
  }
@@ -281,7 +293,6 @@ function submitAddUnitForm() {
 
 function deleteDeadline(e) {
   e.preventDefault();
-
   swal({
     title: "Confirm Deadline Deletion",
     text: "Are you sure you want to delete this deadline?",

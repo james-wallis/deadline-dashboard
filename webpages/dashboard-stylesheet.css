@@ -62,6 +62,7 @@ main, aside {
   color: #3F4045;
   padding: 5px 5px 5px 0;
   text-align: left;
+  font-size: 18px;
 }
 .dashboard-outer-box {
   height: 33vh;
@@ -92,7 +93,7 @@ h1, h2 {
   font-weight: 300;
 }
 h1 {
-  font-size: 38px;
+  font-size: 42px;
 }
 h2 {
   font-size: 30px;
@@ -284,4 +285,82 @@ h2 {
 }
 .sort-deadlines select {
   text-align: center;
+}
+
+
+/* Dashboard API Boxes Styling */
+main h4 {
+  text-align: center;
+  color: #D2D4C8;
+  padding-bottom: 5px;
+  font-size: 26px;
+  text-transform: uppercase;
+}
+
+.news-div {
+  padding: 2% 4%;
+}
+.news-div p {
+  padding: 1% 0;
+  text-align: center;
+  color: #868784;
+}
+
+#last-fm-div {
+  padding: 2% 0;
+}
+/*#last-fm-div h4 {
+  text-align: center;
+  color: #D2D4C8;
+  padding-bottom: 5px;
+  font-size: 30px;
+}*/
+#last-fm-div h5 {
+  font-size: 16px;
+  color: #3F4045;
+  text-align: center;
+  margin-top: 2%;
+}
+#last-fm-div p {
+  padding: 1% 2%;
+  text-align: center;
+  color: #868784;
+  font-size: 20px;
+  text-transform: capitalize;
+}
+#last-fm-div img {
+  display: block;
+  margin: 0 auto;
+}
+
+#weather-div {
+  padding: 2% 4%;
+}
+#weather-div h5 {
+  color: #D2D4C8;
+  text-align: center;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.weather-stats {
+  color: #868784;
+  text-align: center;
+  text-transform: capitalize;
+  font-weight: normal;
+  margin: 1%;
+}
+.weather-container {
+  margin-top: 3%;
+}
+#weather-div p {
+  color: #3F4045;
+  margin: 3%;
+}
+
+#quote-div {
+  padding: 2% 0;
+}
+#quote-div p {
+  margin: 3% 2%;
+  color: #868784;
 }
