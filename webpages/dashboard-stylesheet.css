@@ -66,6 +66,7 @@ main, aside {
 }
 .dashboard-outer-box {
   height: 33vh;
+  padding: 25px;
 }
 .dashboard-inner-box {
   height: 100%;
@@ -230,21 +231,23 @@ h2 {
 #settings-deadlines {
   border-left: 2px solid #868784;
 }
-.add-deadline-form, .remove-deadline-form {
+.add-deadline-form, .remove-form, .remove-unit-form {
   display: block;
   text-align: center;
 }
 .add-deadline-form label, .add-deadline-form input,
-.remove-deadline-form label, .remove-deadline-form input {
+  .remove-form label, .remove-form input,
+  #editDeadlineForm label, #editDeadlineForm select {
   display: block;
   margin: 0 auto;
   margin-top: 10px;
   text-align: center;
 }
-.remove-deadline-form label, .remove-deadline-form select {
+.remove-form label, .remove-form select,
+  .remove-unit-form label, .remove-unit-form select {
   margin: 10px;
 }
-#add-unit {
+#add-unit, #remove-unit-div, #edit-deadline-content {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid #D2D4C8;
@@ -259,7 +262,7 @@ h2 {
 
 #all-deadlines-menu {
   border-left: 2px solid #868784;
-  height: 100%;
+  height: 80%;
 }
 #all-deadlines-menu a {
   text-decoration: none;
@@ -286,7 +289,23 @@ h2 {
 .sort-deadlines select {
   text-align: center;
 }
-
+#deadline-page {
+  text-align: center;
+  position: absolute;
+  left: -8.33%;
+  right: 0;
+  bottom: 5%;
+}
+.page-button {
+  padding: 5px 10px;
+  margin: 0 5px;
+  color: white;
+  border: 1px dashed white;
+}
+#active-page {
+  border: 2px solid white;
+  font-weight: bold;
+}
 
 /* Dashboard API Boxes Styling */
 main h4 {
@@ -367,4 +386,54 @@ main h4 {
 #quote-div p {
   margin: 3% 2%;
   color: #868784;
+}
+
+
+
+/* Add user class for container */
+.sign-up-button-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sign-up-button-div div {
+  padding: 60px;
+}
+.sign-up-button-div h1 {
+  font-size: 50px;
+}
+.sign-up-button-div p {
+  color: #868784;
+  margin: 20px;
+}
+.sign-up-button-div a {
+  text-align: center;
+  padding: 20px;
+  margin: 0 auto;
+  display: block;
+  color: #D2D4C8;
+}
+.sign-up-button-div a:hover {
+  color: #868784;
+  cursor: pointer;
+}
+
+/*add user page*/
+#outer-div-sign-up {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+#add-user-form label {
+  font-size: 22px;
+  color: white;
+}
+#add-user-form input {
+  font-size: 18px;
+  display: block;
+  border-radius: 5px;
+}
+#add-user-form .add-deadline-form {
+  padding: 10px;
 }

@@ -14,6 +14,16 @@ create table if not exists dashboard.units (
   unitColour varchar(7)
 ) charset 'utf8mb4';
 
+create table if not exists dashboard.user (
+  userId int primary key not null auto_increment,
+  userFirstName varchar(50),
+  userLastName varchar(50),
+  userLastFMName varchar(50),
+  userCity varchar(50),
+  user24hrTime boolean DEFAULT 0,
+  userDeadlineGrayScale boolean DEFAULT 0
+) charset 'utf8mb4';
+
 insert ignore into dashboard.deadlines values (1, 'webscript', 'Dashboard Coursework', '2017-03-31 00:00:00');
 insert ignore into dashboard.deadlines values (2, 'INSE', 'Final Report and Application', '2017-04-28 00:00:00');
 insert ignore into dashboard.deadlines values (3, 'dummy', 'description', '2017-05-26 00:00:00');
@@ -25,3 +35,5 @@ insert ignore into dashboard.units values (3, 'cosine', 'Computer Operating Syst
 insert ignore into dashboard.units values (4, 'mathfun', 'Discrete Mathematics and Functional Programming', '#EEEBD0');
 insert ignore into dashboard.units values (5, 'dsalg', 'Data Structures and Algorithms', '#F06543');
 insert ignore into dashboard.units values (6, 'adproc', 'Advanced Programming', '#ABE188');
+
+insert ignore into dashboard.user values (1, 'James', 'Wallis', 'jamesemwallis', 'Portsmouth', 0, 0);

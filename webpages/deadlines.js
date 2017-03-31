@@ -4,6 +4,7 @@
 var deadlinePage = (window.location.href.indexOf("deadlines") != -1);
 //The amount to show on the deadline page (upcoming deadlines)
 var amountToShow = 4;
+var currentPage = 1;
 
 //Event Listeners
 window.addEventListener('load', loadDeadlines);
@@ -13,7 +14,10 @@ if(deadlinePage) {
 } else {
   document.getElementById('addDeadlineForm').addEventListener("submit", confirmSubmitForm);
   document.getElementById('addUnitForm').addEventListener("submit", confirmSubmitForm);
+  document.getElementById('editDeadlineContentForm').addEventListener("submit", confirmSubmitForm);
   document.getElementById('removeDeadlineForm').addEventListener("submit", deleteDeadline);
+  document.getElementById('removeUnitForm').addEventListener("submit", deleteUnit);
+  document.getElementById('edit-deadline').addEventListener("change", loadDeadlineToEdit);
 }
 
 /**
@@ -76,6 +80,7 @@ function addContentToPage(units, deadlines) {
   if (!deadlinePage) {
     addUnitSelectToPage(units);
     addDeadlineDeletionSelectToPage(deadlines);
+    addUnitDeletionSelectToPage(units);
   }
 }
 
@@ -93,8 +98,29 @@ function addDeadlinesToPage(units, deadlines) {
   // Doesn't use deadlines.forEach as the whole deadline table
   // is needed for delete
   var deadlinesAdded = 0;
-  if (deadlinePage || deadlines.length<4) {
+  if(deadlines.length<4) {
     amountToShow = deadlines.length;
+  }
+  else if (deadlinePage) {
+    if (deadlines.length <= 12) {
+      amountToShow = deadlines.length;
+    } else {
+      amountToShow = 12;
+      var tempDeadlines = [];
+      var deadlinesIndex = (currentPage-1)*amountToShow;
+      for (var i = deadlinesIndex; i < deadlines.length; i++) {
+        tempDeadlines.push(deadlines[i]);
+      }
+      deadlines = tempDeadlines;
+      //update amountToShow
+      if (deadlines.length < 11) {
+        amountToShow = deadlines.length;
+      }
+      //Make sure buttons haven't already been created
+      if (!document.getElementsByClassName('page-button')[0]) {
+        addPageButtons(deadlines);
+      }
+    }
   }
   while (deadlinesAdded < amountToShow) {
     var deadline = deadlines[deadlinesAdded];
@@ -127,7 +153,7 @@ function addDeadlinesToPage(units, deadlines) {
     div.appendChild(el);
 
     el = document.createElement('p');
-    var date = datetimeToString(deadline.dueDate);
+    var date = datetimeToString(deadline.dueDate, true);
     el.textContent = date;
     div.appendChild(el);
     deadlinesAdded++;
@@ -162,33 +188,69 @@ function addUnitSelectToPage(units) {
  * Function to add the deadlines to a drop down form for deletion purposes
  */
  function addDeadlineDeletionSelectToPage(deadlines) {
-   var select = document.getElementById('remove-deadline');
-   //clear out current options
-   select.innerHTML = "";
-   var option = document.createElement('option');
-   option.setAttribute("hidden", "");
-   option.setAttribute("selected", "");
-   option.setAttribute("disabled", "");
-   option.textContent = "Select a Deadline";
-   select.appendChild(option);
-   //Loop through each unit
-   deadlines.forEach(function (deadline) {
-     option = document.createElement('option');
-     option.value = deadline.id;
-     var fullDescription = deadline.description;
-     var length = 6;
-     var desc = '';
-     if (fullDescription.length > length) {
-       desc = fullDescription.substring(0, length)+'...';
-     } else {
-       desc = fullDescription;
-     }
-     var date = datetimeToString(deadline.dueDate);
-     option.textContent = ((deadline.title).toUpperCase() + " | " +
-                          desc + ' | '+ date);
+   var removeSelect = document.getElementById('remove-deadline');
+   var editSelect = document.getElementById('edit-deadline');
+   //Add both the remove select and edit select so that both unit selects can
+   // be created using the same function
+   var selectList = [removeSelect, editSelect];
+   for (var i = 0; i < selectList.length; i++) {
+     var select = selectList[i];
+     //clear out current options
+     select.innerHTML = "";
+     var option = document.createElement('option');
+     option.setAttribute("hidden", "");
+     option.setAttribute("selected", "");
+     option.setAttribute("disabled", "");
+     option.textContent = "Select a Deadline";
      select.appendChild(option);
-   });
+     //Loop through each unit
+     deadlines.forEach(function (deadline) {
+       option = document.createElement('option');
+       option.value = deadline.id;
+       var fullDescription = deadline.description;
+       var length = 6;
+       var desc = '';
+       if (fullDescription.length > length) {
+         desc = fullDescription.substring(0, length)+'...';
+       } else {
+         desc = fullDescription;
+       }
+       var date = datetimeToString(deadline.dueDate, true);
+       option.textContent = ((deadline.title).toUpperCase() + " | " +
+                            desc + ' | '+ date);
+       select.appendChild(option);
+     });
+   }
  }
+
+ /**
+  * Function to add the units to a drop down form for deletion and edit purposes
+  */
+  function addUnitDeletionSelectToPage(units) {
+    var removeSelect = document.getElementById('remove-unit');
+    var editSelect = document.getElementById('edit-deadline-content-unit');
+    //Add both the remove select and edit select so that both unit selects can
+    // be created using the same function
+    var selectList = [removeSelect, editSelect];
+    //clear out current options
+    for (var i = 0; i < selectList.length; i++) {
+      var select = selectList[i];
+      select.innerHTML = "";
+      var option = document.createElement('option');
+      option.setAttribute("hidden", "");
+      option.setAttribute("selected", "");
+      option.setAttribute("disabled", "");
+      option.textContent = "Select a Unit";
+      select.appendChild(option);
+      //Loop through each unit
+      units.forEach(function (unit) {
+        option = document.createElement('option');
+        option.value = unit.shortCode.toLowerCase();
+        option.textContent = unit.shortCode.toUpperCase();
+        select.appendChild(option);
+      });
+    }
+  }
 
 /**
  * Function to find the correct unit for the deadline.
@@ -207,6 +269,7 @@ function confirmSubmitForm(e) {
   var formName = "form";
   if (eventId === "addDeadlineForm") {formName = "deadline";}
   if (eventId === "addUnitForm") {formName = "unit";}
+  if (eventId === "editDeadlineContentForm") {formName = "updated deadline";}
   swal({
     title: "Confirm Submit",
     text: "Are you sure you want to add this "+ formName +"?",
@@ -224,6 +287,7 @@ function confirmSubmitForm(e) {
       console.log(eventId);
       if (eventId === "addDeadlineForm") {submitAddDeadlineForm();}
       else if (eventId === "addUnitForm") {submitAddUnitForm();}
+      else if (eventId === "editDeadlineContentForm") {submitEditDeadlineForm();}
     } else {
       swal("Cancelled", "The " + formName + " has not been added", "error");
     }
@@ -310,6 +374,7 @@ function deleteDeadline(e) {
       var objectToDeleteId = document.getElementById('remove-deadline').value;
       var url = '/api/deadlines/';
       url += '?id='+objectToDeleteId;
+      url += '&title=false';
       console.log(objectToDeleteId);
       var xhr = new XMLHttpRequest();
       console.log(url);
@@ -322,13 +387,147 @@ function deleteDeadline(e) {
   });
 }
 
-function datetimeToString(datetime) {
+function deleteUnit(e) {
+  e.preventDefault();
+  swal({
+    title: "Confirm Unit Deletion",
+    text: "If you delete this unit you will delete ALL the deadlines that are\
+            assigned to it. \n\nAre you sure you want to delete this unit?",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#F27474",
+    confirmButtonText: "Yes, delete the unit!",
+    cancelButtonText: "No, I need that!",
+    closeOnConfirm: false,
+    closeOnCancel: false
+  },
+  function(isConfirm){
+    if (isConfirm) {
+      swal("Confirmed!", "Deleting the unit and its deadlines now.", "success");
+      //Remove Unit From Units table
+      var shortCode = document.getElementById('remove-unit').value;
+      var url = '/api/units/';
+      url += '?unitShortCode='+shortCode;
+      console.log(shortCode);
+      var xhr = new XMLHttpRequest();
+      xhr.open('DELETE', url, false); // synchronous request
+      xhr.send();
+      //Remove deadlines that were in the deleted unit
+      url = '/api/deadlines/';
+      url += '?title='+shortCode;
+      console.log(shortCode);
+      var xhr = new XMLHttpRequest();
+      xhr.open('DELETE', url, false); // synchronous request
+      xhr.send();
+      loadDeadlines();
+    } else {
+      swal("Cancelled", "The unit has not been deleted.", "error");
+    }
+  });
+}
+
+function addPageButtons(deadlines) {
+  var amountDeadlines = deadlines.length;
+  var container = document.getElementById('deadline-page');
+  var b,
+      amountPages = amountDeadlines/12;
+  for (var i = 0; i < amountPages; i++) {
+    b = document.createElement('a');
+    b.classList.add('page-button');
+    b.textContent = i+1;
+    if (i==0) {b.id='active-page';}
+    container.appendChild(b);
+  }
+  //Add Event Listeners to added buttons
+  var buttons = document.getElementsByClassName('page-button');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('click', changePage)
+  }
+}
+
+function changePage(e) {
+  var buttons = document.getElementsByClassName('page-button');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].id='';
+  }
+  currentPage = parseInt(e.target.textContent);
+  e.target.id='active-page';
+  loadDeadlines();
+}
+
+function loadDeadlineToEdit(e) {
+  var unitId = e.target.value;
+  console.log(unitId);
+  var url = '/api/deadlines/';
+  url += '?id='+unitId;
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      addDeadlineToEdit(JSON.parse(xhr.responseText));
+    } else {
+      console.error('error getting units', xhr);
+    }
+  }
+  xhr.send();
+}
+
+function addDeadlineToEdit(deadline) {
+  var editTitle = document.getElementById('edit-deadline-content-unit'),
+      editDesc = document.getElementById('edit-deadline-content-description'),
+      editDate = document.getElementById('edit-deadline-content-date'),
+      selectOptions = document.getElementById('edit-deadline-content-unit').options;
+      deadline = deadline[0];
+      for (var i = 0; i < selectOptions.length; i++) {
+        if (selectOptions[i].value.toLowerCase() == deadline.title) {
+        editTitle.value = deadline.title;
+        editTitle.dataset.id = deadline.id;
+      }
+    }
+    editDesc.value = deadline.description;
+    editDate.value = datetimeToString(deadline.dueDate, false);
+}
+
+function submitEditDeadlineForm() {
+  var editTitle = document.getElementById('edit-deadline-content-unit'),
+      editDesc = document.getElementById('edit-deadline-content-description'),
+      editDate = document.getElementById('edit-deadline-content-date');
+      if (editTitle.value != "" && editTitle.value != "Select a Unit" && editDesc.value != "" && editDate.value != "") {
+        var url = '/api/deadlines/'+editTitle.dataset.id;
+        var http = new XMLHttpRequest();
+        http.open('POST', url, true);
+        http.setRequestHeader('Content-Type','application/json');
+        console.log(http.status);
+        console.log(http.onload);
+        http.onload = function() {
+          console.log(http.status);
+          if (http.status == 200) {
+            loadDeadlines();
+            editTitle.value = "Select a Unit";
+            editDesc.value = "";
+            editDate.value = "";
+          }
+        };
+        http.send(JSON.stringify(  {
+            title: editTitle.value,
+            description: editDesc.value,
+            date: editDate.value
+          }
+      ));
+      }
+}
+
+function datetimeToString(datetime, returnAsPrintableString) {
   var d = new Date(datetime);
   var day = d.getDate();
   var month = d.getMonth()+1;
   var year = d.getFullYear();
   if (day < 10) day = ('0'+day);
   if (month < 10) month = ('0'+month);
-  var stringDate = (day+'/'+month+'/'+year);
+  if (returnAsPrintableString) {
+    var stringDate = (day+'/'+month+'/'+year);
+  } else {
+    var stringDate = (year+'-'+month+'-'+day);
+  }
   return stringDate;
 }

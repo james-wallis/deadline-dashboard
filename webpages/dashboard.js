@@ -2,19 +2,89 @@
 var newsapiKey = 'f8b6dcb74300468589b50a53dca36a4c';
 var numStoriesToShow = 3;
 
+//Name used in main greeting
+var userFirstName;
+
 //Last fm used for Spotify
 var lastfmApiKey = 'dac2e4c07554948ac38f77058d557703';
-var lastfmUser = 'jamesemwallis';
-var lastfmGetRecentTracksURL =
-        'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
-        lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
+var lastfmUser;
+
 
 //Open Weather
 var weatherApiKey = 'a358ab331ca3b397d65a029876f08d7b';
-var weatherLocation = 'Portsmouth,uk';
+var weatherLocation;
 
 //Event Listeners
-window.addEventListener('load', loadPageSetIntervals);
+//Get User details
+window.addEventListener('load', getSession);
+// window.addEventListener('load', loadPageSetIntervals);
+
+
+
+
+
+
+function getSession() {
+  var url = '/api/user';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      setGlobalVariables(JSON.parse(xhr.responseText));
+    }
+  }
+  xhr.send();
+}
+
+function setGlobalVariables(session) {
+  console.log(session);
+  if(isEmptyObject(session)) {
+    document.getElementById('container').innerHTML = '';
+    createSignUpButton();
+  } else {
+    userFirstName = session.firstname;
+    document.getElementById('greeting-firstname').textContent = userFirstName;
+    lastfmUser = session.lastfmname;
+    weatherLocation = session.city;
+    //Load API after variables are set
+    loadPageSetIntervals();
+  }
+}
+
+function isEmptyObject(obj) {
+  for (var key in obj) {
+    return false;
+  }
+  return true;
+}
+
+function createSignUpButton() {
+  document.getElementById('settings-icon').style.display = "none";
+  var container = document.getElementById('container');
+  container.classList.add('sign-up-button-div');
+  var innerContainer = document.createElement('div');
+  container.appendChild(innerContainer);
+
+  var h = document.createElement('h1');
+  h.textContent = 'Welcome to the Deadline-Dashboard';
+  innerContainer.appendChild(h);
+
+  var el = document.createElement('p');
+  el.textContent = 'It appears that your user table is empty. This means \
+                    that we need some details from you before we can \
+                    proceed to the dashboard.';
+  innerContainer.appendChild(el);
+
+  el = document.createElement('p');
+  el.textContent = 'Press the link below to proceed to the details page.';
+  innerContainer.appendChild(el);
+
+  el = document.createElement('a');
+  el.textContent = 'Details Page';
+  el.href = '/sign-up';
+  innerContainer.appendChild(el);
+
+}
 
 //setInterval
 function loadPageSetIntervals() {
@@ -25,6 +95,7 @@ function loadPageSetIntervals() {
   getRandQuote();
   getFourFourTwoNews();
   getTechCrunchNews();
+  updateDateTime();
   setInterval(getBBCNews, 300000);
   setInterval(getLastFMNowPlaying, 1000);
   setInterval(getGuardianNews, 300000);
@@ -85,6 +156,9 @@ function loadNewsToDashboard(news, divId) {
 }
 
 function getLastFMNowPlaying() {
+  var lastfmGetRecentTracksURL =
+        'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
+        lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
   var xhr = new XMLHttpRequest();
   xhr.open('GET', lastfmGetRecentTracksURL, true);
   xhr.onload = function() {
@@ -257,7 +331,6 @@ function loadQuoteToDashboard(quote) {
 
 
 //Time functions -- need to be added to an export
-window.addEventListener('load', updateDateTime, true);
 
 var timerSet = false;
 

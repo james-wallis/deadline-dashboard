@@ -14,23 +14,18 @@
   <body>
     <div id="container">
       <main class="col-10">
-        <div class="col-3 dashboard-outer-box">
+        <div class="col-4 dashboard-outer-box">
+          <div id="fourfourtwo-news-div"id="weather-div" class="dashboard-inner-box">
+
+          </div>
+        </div>
+        <div class="col-4 dashboard-outer-box">
           <div id="weather-div" class="dashboard-inner-box">
 
           </div>
         </div>
-        <div class="col-3 dashboard-outer-box">
-          <div id="fourfourtwo-news-div" class="dashboard-inner-box">
-
-          </div>
-        </div>
-        <div class="col-3 dashboard-outer-box">
+        <div class="col-4 dashboard-outer-box">
           <div id="guardian-news-div" class="dashboard-inner-box">
-
-          </div>
-        </div>
-        <div class="col-3 dashboard-outer-box">
-          <div id="tech-crunch-div" class="dashboard-inner-box">
 
           </div>
         </div>
@@ -41,7 +36,7 @@
         </div>
         <div id="dashboard-welcome-container" class="col-6 dashboard-outer-box">
           <div id="dashboard-welcome">
-            <h1><span id="timeOfDay"></span>, James</h1>
+            <h1><span id="timeOfDay"></span>, <span id="greeting-firstname">James</span></h1>
             <p>It is <span id="currentTime" class="datetime"></span></p>
             <p>On <span id="dayOfTheWeek" class="datetime"></span> the <span id="dateMonth" class="datetime"></span></p>
           </div>
@@ -51,22 +46,17 @@
 
           </div>
         </div>
-        <div class="col-3 dashboard-outer-box">
+        <div class="col-4 dashboard-outer-box">
           <div id="bbc-news-div" class="dashboard-inner-box">
 
           </div>
         </div>
-        <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
+        <div class="col-4 dashboard-outer-box">
+          <div id="tech-crunch-div" class="dashboard-inner-box">
 
           </div>
         </div>
-        <div class="col-3 dashboard-outer-box">
-          <div class="dashboard-inner-box">
-
-          </div>
-        </div>
-        <div class="col-3 dashboard-outer-box">
+        <div class="col-4 dashboard-outer-box">
           <div class="dashboard-inner-box">
 
           </div>
@@ -140,19 +130,69 @@
           <h3>Remove a Deadline</h3>
           <p>To remove a deadline, find the deadline in the drop down menu below.</p>
           <form id="removeDeadlineForm" action="/api/deadlines" method="delete">
-            <div class="remove-deadline-form">
+            <div class="remove-form">
               <label for="remove-deadline">Deadline to remove</label>
               <select id="remove-deadline" class="" name="remove-deadline">
                 <!-- Options will go here -->
               </select>
             </div>
             <input type="submit" name="submit" value="Remove Deadline">
+          </form>
+            <div id="remove-unit-div">
+              <h4>Remove a Unit</h4>
+              <p>To remove a unit, select it from the drop down menu below.</p>
+              <form id="removeUnitForm" action="/api/units" method="post">
+                <div class="remove-form">
+                  <label for="remove-unit">Unit to remove</label>
+                  <select id="remove-unit" class="" name="remove-unit">
+                    <!-- Options will go here -->
+                  </select>
+                </div>
+                <input type="submit" name="submit" value="Remove Unit">
+              </form>
+            </div>
         </div>
         <div class="col-3 deadline-settings">
           <h3>Edit a Deadline</h3>
+          <p>To edit a deadline, find the deadline you
+            would like to edit it in the drop down box.</p>
+          <p>The content of this deadline will then enter
+              itself into the input boxes below.</p>
+          <p>Here you can edit the deadline, and
+              when it is finished, re-save it.</p>
+          <form id="editDeadlineForm" action="/api/deadlines" method="post">
+            <label for="edit-deadline">Deadline to Edit</label>
+            <select id="edit-deadline" class="" name="edit-deadline">
+              <!-- Options will go here -->
+            </select>
+          </form>
+          <div id="edit-deadline-content">
+            <form id="editDeadlineContentForm" action="/api/deadlines" method="post">
+              <div class="add-deadline-form">
+                <label for="edit-deadline-unit">Unit</label>
+                <select id="edit-deadline-content-unit" class="" name="edit-deadline-unit">
+                  <!-- Options will go here -->
+                </select>
+              </div>
+              <div class="add-deadline-form">
+                <label for="deadline-description">Description</label>
+                <input type="text" name="deadline-description"
+                          id="edit-deadline-content-description" value=""
+                          placeholder="Description">
+              </div>
+              <div class="add-deadline-form">
+                <label for="edit-deadline-date">Due Date</label>
+                <input type="date" name="edit-deadline-date"
+                id="edit-deadline-content-date" value="">
+              </div>
+              <input type="submit" name="submit" value="Save Edit">
+            </form>
+          </div>
         </div>
         <div class="col-3 deadline-settings">
           <h3>Change Deadline Settings</h3>
+          <label for="greyscale">View deadlines in Greyscale</label>
+          <input id="grey-scale-checkbox" type="checkbox" name="greyscale" value="Grey Scale">
         </div>
       </div>
       <div id="settings-deadlines" class="col-2">
