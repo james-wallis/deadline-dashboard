@@ -100,8 +100,7 @@ It is customisable as the user can choose which api's to see in which box.
 Additionally, the user is able to add deadlines and course units in order to view the deadlines that are up and coming.
 For the news boxes I use [News API](https://newsapi.org/) to get the current news. This allows me to easily add new id's for the content whilst using the same styling for each news box.
 
-Most of the dashboard is my own work, but I use the library 'sweetalert' in order to do form confirms.
-[Sweet Alert](http://t4t5.github.io/sweetalert/)
+Most of the dashboard is my own work, but I use the library [Sweet Alert](http://t4t5.github.io/sweetalert/) in order to do form confirms.
 
 _Areas for improvement_
 
@@ -113,3 +112,28 @@ _Areas for improvement_
 ##### Maintainability
 
 > Code style, comprehensibility and maintainability. This includes formatting, file structure, naming - everything that can help your work live on and be useful after it is graded, including how well the code and any documentation communicates any concepts necessary to understand the architecture and configuration of the system.
+
+All code is formatted in a readable manner, with each function having a comment instructing the user/developer what it does.
+To this end I believe that the code is clear, yet I know it could be improved as there are functions that could be created to stop duplication of code.
+Each function is named in such a way that it attempts to portray clearly what it does without comments.
+Huge downside of the dashboard is the file structure. Apart from the server.js file, all javascript, html and css files are in the same folder when they should be split into seperate ones. This became apparent very close to the deadline for the coursework and I decided that I wouldn't take the risk that changing the locations of the file would break the dashboard.
+
+_Areas for improvement_
+
+* Code duplication needs to be reduced.
+* Comments could be made better and more informative in places
+* File structure needs a revamp
+
+#### Usability
+
+> Ease-of-use of your system, including the use of event-driven input, background refresh, drag and drop, intuitive UI design, etc.
+
+The system is easy to use. The main difficulty with it is finding the settings menu button. This is because I have intentionally hidden it so that it is not easy to see when the dashboard is being displayed (with no user input) for long periods of time.
+I created an introduction page which runs after the user account has been created which contains a .gif and description of where the menu bar is located.
+There is a lot of background-refresh which takes place to refresh the news boxes and the lastfm one particularily (the lastfm refresh takes place every second so that it updates when the song changes).
+I have not used drag and drop and in hindsight think that this is the right decision as I believe it would distract from the purpose of the dashboard and overcomplicate it.
+
+_Areas for improvement_
+
+* UI could have some improvement to make things clearer such as font scaling for different sizes screens.
+* Feedback could be taken from different users to get ideas on different menu buttons or whether the current, hidden button is fine for the dashboard.
