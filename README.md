@@ -1,10 +1,10 @@
-deadline-dashboard
-======
+#deadline-dashboard
+
 
 The deadline-dashboard for my second year WebScript coursework.
 
-Web Application Brief
-----------------
+##Web Application Brief
+
 
 Your challenge is to create a Configurable Dashboard.
 
@@ -26,8 +26,8 @@ Critically evaluate the design and implementation of web applications.
 
 
 
-Running the dashboard
-----------------
+##Running the dashboard
+
 
 To get the dashboard running, you must install the source code and all modules and then run the server from the command line:
 
@@ -62,4 +62,23 @@ To get the dashboard running, you must install the source code and all modules a
   This ensures that if you edit the code (or upload a new version), the server will restart.
 
 5. Visit your website.
-    * If you're on your VM you just need to put your VM's IP address into a browser, or if you're developing on a desktop machine it will be http://127.0.0.1:8080 .
+    * If you're on your VM you just need to put your VM's IP address into a browser, or if you're developing on a desktop machine it will be http://127.0.0.1:8080.
+
+###Use of Last FM
+
+
+The Dashboard takes in a users lastfm username so it is ideal if you create one before you start the dashboard for the first time.
+There is currently no way to change the lastfm username once the user has been created (but this feature will be added once the coursework has been submitted. Reason for lack of function: Ran out of time.)
+
+Through using last fm you can display your currently playing song on last fm, but also last fm can be added to spotify in order to display your spotify currently playing.
+
+[Last FM create account](https://www.last.fm/join)
+
+[Add Spotify to Last FM](https://support.spotify.com/us/using_spotify/playlists/scrobble-to-last-fm/)
+
+About the Dashboard
+--------------
+
+The Dashboard is designed for one user and one user only. Adding more than one user to the database will not change anything in the dashboard.
+It has been designed for personal use outside of its coursework origins. I intend to use it as either a new tab page for chrome or a dashboard in my bedroom.
+Its major purpose is to tell me my upcoming deadlines and also to keep me updated with the news, displaying the weather and telling me what my spotify is playing.
