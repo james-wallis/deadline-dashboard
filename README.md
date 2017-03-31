@@ -87,4 +87,29 @@ Its major purpose is to tell me my upcoming deadlines and also to keep me update
 
 #### Functionality
 
-> How appropriate is the design?  Does it all work?  How much does it do?  How much is your own work as opposed to libraries? 
+> How appropriate is the design?  Does it all work?  How much does it do?  How much is your own work as opposed to libraries?
+
+Firstly, the design. I think the design complements its features. While sometimes there are scaling issues on smaller screens, on larger ones, for which it is designed, it looks clear and easy to read. It was designed to sit in the background of a room, not attracting attention so that it would not be a distraction, however the coloured deadlines make them stand out on the page.
+
+It mostly all works, there are features such as grey scaling the deadlines on the deadline page which did not get implemented aswell as making the clock 24hrs as an option. However everything else that has been created works as it should.
+
+It does _a lot_.
+
+The Dashboard is able to show different api's (the news ones are especially easy to add), such as news, last fm, quotes and the weather.
+It is customisable as the user can choose which api's to see in which box.
+Additionally, the user is able to add deadlines and course units in order to view the deadlines that are up and coming.
+For the news boxes I use [News API](https://newsapi.org/) to get the current news. This allows me to easily add new id's for the content whilst using the same styling for each news box.
+
+Most of the dashboard is my own work, but I use the library 'sweetalert' in order to do form confirms.
+[Sweet Alert](http://t4t5.github.io/sweetalert/)
+
+_Areas for improvement_
+
+* If I had more time, I would add more api's to select and add to the dashboard. The main issue with this at the moment is that unless it comes from newsAPI the custom styling for each different api is custom to it.
+* The functionality to change a user profile after it has been created.
+* The ability to see passed deadlines as well as mark them as completed.
+* Functionality to display when there is less than a week until a deadline.
+
+##### Maintainability
+
+> Code style, comprehensibility and maintainability. This includes formatting, file structure, naming - everything that can help your work live on and be useful after it is graded, including how well the code and any documentation communicates any concepts necessary to understand the architecture and configuration of the system.
