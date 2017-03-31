@@ -1,9 +1,10 @@
 'use strict';
-
 //Global Variables
+//Works out whether the user is currently viewing the dashboard or the deadline page
 var deadlinePage = (window.location.href.indexOf("deadlines") != -1);
 //The amount to show on the deadline page (upcoming deadlines)
 var amountToShow = 4;
+//The current page, used on the deadline page
 var currentPage = 1;
 
 //Event Listeners
@@ -69,6 +70,8 @@ function loadUnitsWithDeadlines(deadlines) {
 
 /**
  * Function to add all the dynamic content to the page
+ * @param units, the units loaded from the database
+ * @param deadlines, the deadlines loaded from the database
  */
 function addContentToPage(units, deadlines) {
   addDeadlinesToPage(units, deadlines);
@@ -79,6 +82,11 @@ function addContentToPage(units, deadlines) {
   }
 }
 
+/**
+ * Function to add all the deadlines to the page
+ * @param units, the units loaded from the database
+ * @param deadlines, the deadlines loaded from the database
+ */
 function addDeadlinesToPage(units, deadlines) {
   // clear out old deadlines
   var container = document.getElementById('deadline-container');
@@ -98,8 +106,12 @@ function addDeadlinesToPage(units, deadlines) {
   }
   else if (deadlinePage) {
     if (deadlines.length <= 12) {
+      //If there are less than 12 deadlines the deadline
+      // page does not need to be split up
       amountToShow = deadlines.length;
     } else {
+      // If there are more than 12 create a tempList which holds
+      // the correct deadlines to be viewed on that page
       amountToShow = 12;
       var tempDeadlines = [];
       var deadlinesIndex = (currentPage-1)*amountToShow;
@@ -135,8 +147,6 @@ function addDeadlinesToPage(units, deadlines) {
     var div = document.createElement('div');
     div.classList.add('deadline');
     div.style.backgroundColor = currentUnitColour;
-    // var deadlineID = getDeadlineID(deadline.title);
-    // div.id = deadlineID;
     container.appendChild(div);
 
     var h = document.createElement('h3');
@@ -159,6 +169,7 @@ function addDeadlinesToPage(units, deadlines) {
 /**
  * Function to add the units to the units selection in the
  * add a deadline drop down form
+ * @param units, the units loaded from the database
  */
 function addUnitSelectToPage(units) {
   var select = document.getElementById('add-deadline-title');
@@ -181,6 +192,7 @@ function addUnitSelectToPage(units) {
 
 /**
  * Function to add the deadlines to a drop down form for deletion purposes
+ * @param deadlines, the deadlines loaded from the database
  */
  function addDeadlineDeletionSelectToPage(deadlines) {
    var removeSelect = document.getElementById('remove-deadline');
@@ -220,6 +232,7 @@ function addUnitSelectToPage(units) {
 
  /**
   * Function to add the units to a drop down form for deletion and edit purposes
+  * @param units, the units from the database
   */
   function addUnitDeletionSelectToPage(units) {
     var removeSelect = document.getElementById('remove-unit');
@@ -256,7 +269,10 @@ function findColour(unit, element, array) {
 }
 
 /**
- * Function to confirm that a form is meant to be submitted before sumbitting it
+ * Function to confirm that a form is meant to be submitted before subitting it
+ * Used in the settings part of the dashboard page.
+ * Gets the id from the element that has had its event listener called to ensure
+ * that it runs the correct add or edit database script
  */
 function confirmSubmitForm(e) {
   var eventId = event.target.id;
@@ -279,7 +295,6 @@ function confirmSubmitForm(e) {
   function(isConfirm){
     if (isConfirm) {
       swal("Confirmed!", "Adding " + formName + " now.", "success");
-      console.log(eventId);
       if (eventId === "addDeadlineForm") {submitAddDeadlineForm();}
       else if (eventId === "addUnitForm") {submitAddUnitForm();}
       else if (eventId === "editDeadlineContentForm") {submitEditDeadlineForm();}
@@ -293,7 +308,6 @@ function confirmSubmitForm(e) {
  * Function to submit the add Deadline form and add a new deadline to the database
  */
 function submitAddDeadlineForm() {
-  // e.preventDefault();
   var addTitle = document.getElementById('add-deadline-title'),
       addDesc = document.getElementById('add-deadline-description'),
       addDate = document.getElementById('add-deadline-date');
@@ -319,13 +333,13 @@ function submitAddDeadlineForm() {
   }
 }
 
-
+/**
+ * Function to add a new unit to the database
+ */
 function submitAddUnitForm() {
-  // e.preventDefault();
   var addUnitShortCode = document.getElementById('addUnitShortcode'),
       addUnitLongName = document.getElementById('addUnitLongcode'),
       addUnitColour = document.getElementById('addUnitColour');
-      console.log("function run");
   if (addUnitShortCode.value != "" && addUnitLongName.value != "" && addUnitColour.value != "") {
     var url = '/api/units';
     var http = new XMLHttpRequest();
@@ -335,7 +349,6 @@ function submitAddUnitForm() {
       if (http.status == 200) {
         swal("Unit Added!", "Your new unit has been successfully added.",
               "success");
-        console.log("Status is 200");
         addUnitShortCode.value = "";
         addUnitLongName.value = "";
         addUnitColour.value = "";
@@ -350,6 +363,9 @@ function submitAddUnitForm() {
   }
 }
 
+/**
+ * Function to delete a deadline from the database
+ */
 function deleteDeadline(e) {
   e.preventDefault();
   swal({
@@ -370,9 +386,7 @@ function deleteDeadline(e) {
       var url = '/api/deadlines/';
       url += '?id='+objectToDeleteId;
       url += '&title=false';
-      console.log(objectToDeleteId);
       var xhr = new XMLHttpRequest();
-      console.log(url);
       xhr.open('DELETE', url, false); // synchronous request
       xhr.send();
       loadDeadlines();
@@ -382,6 +396,9 @@ function deleteDeadline(e) {
   });
 }
 
+/**
+ * Function to delete a unit from the database
+ */
 function deleteUnit(e) {
   e.preventDefault();
   swal({
@@ -403,14 +420,12 @@ function deleteUnit(e) {
       var shortCode = document.getElementById('remove-unit').value;
       var url = '/api/units/';
       url += '?unitShortCode='+shortCode;
-      console.log(shortCode);
       var xhr = new XMLHttpRequest();
       xhr.open('DELETE', url, false); // synchronous request
       xhr.send();
       //Remove deadlines that were in the deleted unit
       url = '/api/deadlines/';
       url += '?title='+shortCode;
-      console.log(shortCode);
       var xhr = new XMLHttpRequest();
       xhr.open('DELETE', url, false); // synchronous request
       xhr.send();
@@ -421,6 +436,10 @@ function deleteUnit(e) {
   });
 }
 
+/**
+ * Function to add the buttons to the bottom of the deadline page
+ * adds an event listener to each button in order to get the correct elements
+ */
 function addPageButtons(deadlines) {
   var amountDeadlines = deadlines.length;
   var container = document.getElementById('deadline-page');
@@ -440,6 +459,10 @@ function addPageButtons(deadlines) {
   }
 }
 
+/**
+ * Function to change the current 'page' of the deadlines
+ * changes what deadlines are being shown on the deadline page
+ */
 function changePage(e) {
   var buttons = document.getElementsByClassName('page-button');
   for (var i = 0; i < buttons.length; i++) {
@@ -450,9 +473,11 @@ function changePage(e) {
   loadDeadlines();
 }
 
+/**
+ * Function to load a specific deadline from the database
+ */
 function loadDeadlineToEdit(e) {
   var unitId = e.target.value;
-  console.log(unitId);
   var url = '/api/deadlines/';
   url += '?id='+unitId;
   var xhr = new XMLHttpRequest();
@@ -467,6 +492,10 @@ function loadDeadlineToEdit(e) {
   xhr.send();
 }
 
+/**
+ * Function to add the deadline to the edit boxes on the dashboard settings
+ * in order for it to be able to be edited
+ */
 function addDeadlineToEdit(deadline) {
   var editTitle = document.getElementById('edit-deadline-content-unit'),
       editDesc = document.getElementById('edit-deadline-content-description'),
@@ -483,6 +512,9 @@ function addDeadlineToEdit(deadline) {
     editDate.value = datetimeToString(deadline.dueDate, false);
 }
 
+/**
+ * Function to submit the editted deadline to the database
+ */
 function submitEditDeadlineForm() {
   var editTitle = document.getElementById('edit-deadline-content-unit'),
       editDesc = document.getElementById('edit-deadline-content-description'),
@@ -492,10 +524,7 @@ function submitEditDeadlineForm() {
         var http = new XMLHttpRequest();
         http.open('POST', url, true);
         http.setRequestHeader('Content-Type','application/json');
-        console.log(http.status);
-        console.log(http.onload);
         http.onload = function() {
-          console.log(http.status);
           if (http.status == 200) {
             loadDeadlines();
             editTitle.value = "Select a Unit";
@@ -512,6 +541,13 @@ function submitEditDeadlineForm() {
     }
 }
 
+/**
+ * Function to turn a datetime into a readable format
+ * @param datetime, the datetime in need or formatting
+ * @param returnAsPrintableString, if true the string that is returned will
+ *        be ready to be printed to the dashboard.
+ *        If False the string will be returned in a format for database queries
+ */
 function datetimeToString(datetime, returnAsPrintableString) {
   var d = new Date(datetime);
   var day = d.getDate();
