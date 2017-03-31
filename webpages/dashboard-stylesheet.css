@@ -135,30 +135,6 @@ h2 {
   padding: 3px;
 }
 
-/* Individual Styles for each unit */
-/* NOT USED AS DIFFERENT WAY TO STYLE DEADLINES */
-#mathfun {
-  background-color: #EEEBD0;
-}
-#webscript {
-  background-color: #C6D4FF;
-}
-#dsalg {
-  background-color: #F06543;
-}
-#cosine {
-  background-color: #869D7A;
-}
-#adproc {
-  background-color: #ABE188;
-}
-#inse {
-  background-color: #F2C57C;
-}
-#other {
-  background-color: #FBFBFB;
-}
-
 
 
 
@@ -252,7 +228,21 @@ h2 {
   padding-top: 10px;
   border-top: 1px solid #D2D4C8;
 }
-
+/* Number that indicates which box it is */
+.dashboard-box-number {
+  position: absolute;
+  margin: 0 auto;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.api-selector-div {
+  text-align: center;
+  margin: 15px 0;
+}
+.api-selector-div h4 {
+  font-weight: lighter;
+}
 
 
 
@@ -306,6 +296,7 @@ h2 {
   border: 2px solid white;
   font-weight: bold;
 }
+
 
 /* Dashboard API Boxes Styling */
 main h4 {
@@ -436,4 +427,25 @@ main h4 {
 }
 #add-user-form .add-deadline-form {
   padding: 10px;
+}
+#header {
+  text-transform: capitalize;
+}
+.introduction {
+  width: 50%;
+}
+.introduction p {
+  margin: 10px 0;
+  color: #868784;
+}
+.introduction img {
+  display: block;
+  margin: 0 auto;
+}
+.introduction a {
+  text-align: center;
+  padding: 20px;
+  margin: 0 auto;
+  display: block;
+  color: #D2D4C8;
 }

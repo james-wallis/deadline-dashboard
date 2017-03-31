@@ -16,13 +16,6 @@ var webpages = __dirname + '/webpages/';
 // static files
 app.use('/', express.static(webpages, { extensions: ['html'] }));
 
-//Set up session
-app.use(cookieParser());
-app.use(session({ secret: 'webscriptdashboard2017', cookie: { maxAge: 60000 }, resave: true, saveUninitialized: true }))
-
-
-
-
 /** bodyParser.urlencoded(options)
  * Parses the text as URL encoded data (which is how browsers tend to send form data from regular forms set to POST)
  * and exposes the resulting object (containing the keys and values) on req.body
@@ -43,30 +36,37 @@ app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.
 
 
 // server api
+//   GET  /api/user          - get variables used for a session, username, city for weather
+//   POST /api/user          - Add a new user, only called once as the program has one user
+//   GET  /api/deadlines     - list deadlines ordered by time from most recent, returns [like above, like above, ...]
+//         ?order=...        - on the dashboard page ordered by closest date, on the deadline page changes depending on what the user wants
 //   POST /api/deadlines     - upload a new deadline, its title, desc and its due date, returns {id: ..., title: ..., desc: ..., duedate...}
-//   GET  /api/deadlines     - list pictures ordered by time from most recent, returns [like above, like above, ...]
-//         ?order=...       - ordered by closest deadline
-//         ?unit=...       - search by course units
-//   DELETE /api/deadlines/x - returns http status code only
-
+//   POST /api/deadlines/:id - used to update a deadline, uses :id to get the deadline id to be updated
+//   DELETE /api/deadlines   - deletes a deadline from the dashboard and database
+//   GET  /api/units         - Lists units ordered in the way they are entered into the table
+//   POST /api/units         - Adds a unit to the database
+//   DELETE /api/units       - Deletes a unit from the database
+//   GET  /api/loadedApis    - Gets the list of apis that have functions created
+//   GET  /api/layout        - Gets the list of the current layout used to assign the correct id's to the correct divs
+//   POST /api/layout/:boxno - Updates the layout table, uses the boxno to find the correct element in the table
 app.get('/api/user', sendSessionVariables);
 app.post('/api/user', addUser);
 app.get('/api/deadlines', sendDeadlines);
-app.post('/api/deadlines/:id', updateDeadline);
 app.post('/api/deadlines', uploadDeadline);
+app.post('/api/deadlines/:id', updateDeadline);
+app.delete('/api/deadlines', deleteDeadline);
 app.get('/api/units', sendUnits);
 app.post('/api/units', uploadUnit);
-app.delete('/api/deadlines', deleteDeadline);
 app.delete('/api/units', deleteUnit);
-
-
-
+app.get('/api/loadedApis', sendApis);
+app.get('/api/layout', getLayout);
+app.post('/api/layout/:boxno', updateLayout);
 
 // start the server
 app.listen(8080);
 
-
 /* server functions
+ * (Thanks for this!)
  *
  *
  *    ####  ###### #####  #    # ###### #####     ###### #    # #    #  ####  ##### #  ####  #    #  ####
@@ -79,6 +79,11 @@ app.listen(8080);
  *
  */
 
+/**
+ * function to load the session variables from the database
+ * @return the session variables such as first name, last name, lastFmname,
+ *         city for weather, time format, and greyscale for the deadlines
+ */
 function sendSessionVariables(req, res) {
   //Get user details from user table
   var query = 'SELECT userFirstName, userLastName, userLastFMName, \
@@ -103,6 +108,10 @@ function sendSessionVariables(req, res) {
  });
 }
 
+/**
+ * Function to add a new user to the database
+ * Creates a new db record for user and then querys the database
+ */
 function addUser(req, res) {
   var dbRecord = {
     userFirstName: req.body.firstname,
@@ -112,11 +121,8 @@ function addUser(req, res) {
     user24hrTime: req.body.time,
     userDeadlineGrayScale: req.body.greyscale
   };
-  console.log(sql.format('INSERT INTO user SET ? ', dbRecord));
   sql.query(sql.format('INSERT INTO user SET ? ', dbRecord), function (err, result) {
     if (err) console.log("Error inserting");
-    console.log(err);
-    console.log(dbRecord);
     if (req.accepts('html')) {
       // browser should go to the listing of units
       res.redirect(303, '#');
@@ -131,6 +137,10 @@ function addUser(req, res) {
   });
 }
 
+/**
+ * Function to send the list of deadlines
+ * @return the list of deadlines created when the database was queried
+ */
 function sendDeadlines(req, res) {
  var deadlines = [];
  // prepare query
@@ -139,9 +149,6 @@ function sendDeadlines(req, res) {
  query += ' WHERE dueDate >= CURRENT_DATE()';
  if (req.query.id) {
    query += ' AND id = '+sql.escape(req.query.id)
- }
- else if (req.query.title) {
-   query += ' WHERE title LIKE ' + sql.escape('%' + req.query.title + '%');
  }
  var sort;
  switch (req.query.order) {
@@ -156,11 +163,9 @@ function sendDeadlines(req, res) {
  if (req.query.limit) {
    query += ' LIMIT '+ escape(req.query.limit);
  }
- console.log(query);
  // now query the table and output the results
  sql.query(query, function (err, data) {
    if (err) return error(res, 'failed to run the query', err);
-
    data.forEach(function (row) {
      deadlines.push({
        id: row.id,
@@ -173,24 +178,17 @@ function sendDeadlines(req, res) {
  });
 }
 
+/**
+ * Function to update a deadline
+ * Uses the req.params.id to get the deadline id to update
+ */
 function updateDeadline(req, res) {
-  console.log(req.body.title);
-  console.log(req.body.description);
-  console.log(req.body.date);
-  console.log(req.params.id);
   var title = req.body.title,
       desc = req.body.description,
       date = req.body.date,
       id = req.params.id;
   sql.query('UPDATE deadlines SET title= ? , description= ? , dueDate= ? WHERE id = ?', [title, desc, date, id], function(err) {
-    console.log('UPDATE deadlines SET ? WHERE ?', [{ title: title }, { description: desc }, { dueDate: date}]);
-    // if (!err) {
-    //   res.status(201);
-    // } else {
-    //   res.status(500);
-    // }
     if (err) console.log("Error inserting");
-
     if (req.accepts('html')) {
       // browser should go to the listing of deadlines
       res.redirect(303, '/#' + id);
@@ -202,20 +200,19 @@ function updateDeadline(req, res) {
   });
 }
 
+/**
+ * Function to upload a deadline into the database
+ * Creates the dbRecord and queries the database
+ */
 function uploadDeadline(req, res) {
- console.log(req.body.title);
- console.log(req.body.description);
- console.log(req.body.date);
  //Add deadline to the database
  var dbRecord = {
    title: req.body.title,
    description: req.body.description,
    dueDate: req.body.date
  };
- console.log(sql.format('INSERT INTO deadlines SET ?', dbRecord));
  sql.query(sql.format('INSERT INTO deadlines SET ?', dbRecord), function (err, result) {
    if (err) console.log("Error inserting");
-
    if (req.accepts('html')) {
      // browser should go to the listing of deadlines
      res.redirect(303, '/#' + result.insertId);
@@ -227,11 +224,14 @@ function uploadDeadline(req, res) {
  });
 }
 
+/**
+ * Function to send the units list in order to be able to print the units
+ * @return the list of units
+ */
 function sendUnits(req, res) {
  var units = [];
  // prepare query
  var query = 'SELECT id, unitShortCode, unitLongName, unitColour FROM units';
- console.log(query);
  // now query the table and output the results
  sql.query(query, function (err, data) {
    if (err) return error(res, 'failed to run the query', err);
@@ -247,10 +247,11 @@ function sendUnits(req, res) {
  });
 }
 
+/**
+ * Function to add a unit to the database
+ * Creates a dbRecord and then queries the database
+ */
 function uploadUnit(req, res) {
- console.log(req.body.unitShortCode);
- console.log(req.body.unitLongName);
- console.log(req.body.unitColour);
  //Add unit to the database
  var dbRecord = {
    unitShortCode: req.body.unitShortCode,
@@ -259,7 +260,6 @@ function uploadUnit(req, res) {
  };
  sql.query(sql.format('INSERT INTO units SET ?', dbRecord), function (err, result) {
    if (err) console.log("Error inserting");
-
    if (req.accepts('html')) {
      // browser should go to the listing of units
      res.redirect(303, '/#' + result.insertId);
@@ -271,16 +271,18 @@ function uploadUnit(req, res) {
  });
 }
 
+/**
+ * Function to delete a deadline
+ * if req.query.title is not false it will delete all the deadlines that have the same title (unit)
+ * this is used in unit delete so that a deadline cannot exist if its unit does not
+ */
 function deleteDeadline(req, res) {
-  console.log("Log"+[req.query.title]);
   if ([req.query.title] != 'false') {
-    console.log("TITLE");
     sql.query(sql.format('DELETE FROM deadlines WHERE title=?', [req.query.title]), function (err, result) {
       if (err) return error(res, 'failed sql delete', err);
       res.sendStatus(200);
     });
   } else {
-    console.log("ID");
     sql.query(sql.format('DELETE FROM deadlines WHERE id=?', [req.query.id]), function (err, result) {
       if (err) return error(res, 'failed sql delete', err);
       res.sendStatus(200);
@@ -288,9 +290,76 @@ function deleteDeadline(req, res) {
   }
 }
 
+/**
+ * Function to delete a unit from the database
+ */
 function deleteUnit(req, res) {
   sql.query(sql.format('DELETE FROM units WHERE id=?', [req.query.id]), function (err, result) {
     if (err) return error(res, 'failed sql delete', err);
     res.sendStatus(200);
+  });
+}
+
+/**
+ * Function to send the list of apis
+ * @return the list of apis
+ */
+function sendApis(req, res) {
+  var apiList = [];
+  // prepare query
+  var query = 'SELECT id, apiName, apiId, fromNewsApi FROM apis';
+  // now query the table and output the results
+  sql.query(query, function (err, data) {
+    if (err) return error(res, 'failed to run the query', err);
+    data.forEach(function (row) {
+      apiList.push({
+        id: row.id,
+        name: row.apiName,
+        htmlid: row.apiId,
+        isNews: row.fromNewsApi
+      });
+    });
+    res.json(apiList);
+  });
+}
+
+/**
+ * Function to get the saved layout of the dashboard
+ * Used to add each id to the dashboard
+ */
+function getLayout(req, res) {
+  var layout = [];
+  // prepare query
+  var query = 'SELECT boxNo, boxId FROM layout';
+  // now query the table and output the results
+  sql.query(query, function (err, data) {
+    if (err) return error(res, 'failed to run the query', err);
+    data.forEach(function (row) {
+      layout.push({
+        boxNo: row.boxNo,
+        boxId: row.boxId
+      });
+    });
+    res.json(layout);
+  });
+}
+
+/**
+ * Function to update the layout table
+ * Called when one api is changed in the settings menu
+ */
+function updateLayout(req, res) {
+  var boxId = req.body.boxid,
+      boxNo = req.params.boxno;
+  sql.query('UPDATE layout SET boxId= ? WHERE boxNo = ?', [boxId, boxNo], function(err) {
+    if (err) console.log("Error inserting");
+    if (req.accepts('html')) {
+      // browser should go to the listing of deadlines
+      res.redirect(303, '/#' + boxNo);
+    } else {
+      res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
+      // XML HTTP request that accepts JSON will instead get that
+      res.json({boxNo: boxNo, boxId: boxId});
+    }
   });
 }

@@ -19,6 +19,10 @@ function adjustMenuLeft() {
 
 function showSettingsMenu() {
   document.getElementById("settings-container").style.left = 0;
+  var dashboardBoxNumbers = document.getElementsByClassName('dashboard-box-number');
+  for (var i = 0; i < dashboardBoxNumbers.length; i++) {
+    dashboardBoxNumbers[i].style.opacity = "1";
+  }
 }
 
 function hideSettingsMenu() {
@@ -26,17 +30,28 @@ function hideSettingsMenu() {
   document.getElementById("settings-container").style.left = windowWidth+'px';
   document.getElementById('settings-dashboard').style.opacity = 0;
   document.getElementById('settings-deadlines').style.opacity = 1;
+  var dashboardBoxNumbers = document.getElementsByClassName('dashboard-box-number');
+  for (var i = 0; i < dashboardBoxNumbers.length; i++) {
+    dashboardBoxNumbers[i].style.opacity = "0";
+  }
 }
 
 function switchSettingSide() {
   var dashboardSide = document.getElementById('settings-dashboard');
   var deadlineSide = document.getElementById('settings-deadlines');
+  var dashboardBoxNumbers = document.getElementsByClassName('dashboard-box-number');
   if (deadlineSide.style.opacity == "" || deadlineSide.style.opacity == '1') {
     dashboardSide.style.opacity = '1';
     deadlineSide.style.opacity = '0';
+    for (var i = 0; i < dashboardBoxNumbers.length; i++) {
+      dashboardBoxNumbers[i].style.opacity = "0";
+    }
   }
   else {
     deadlineSide.style.opacity = '1';
     dashboardSide.style.opacity = '0';
+    for (var i = 0; i < dashboardBoxNumbers.length; i++) {
+      dashboardBoxNumbers[i].style.opacity = "1";
+    }
   }
 }

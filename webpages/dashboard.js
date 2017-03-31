@@ -1,6 +1,7 @@
 //Global Variables
 var newsapiKey = 'f8b6dcb74300468589b50a53dca36a4c';
 var numStoriesToShow = 3;
+var intervals = false;
 
 //Name used in main greeting
 var userFirstName;
@@ -14,9 +15,13 @@ var lastfmUser;
 var weatherApiKey = 'a358ab331ca3b397d65a029876f08d7b';
 var weatherLocation;
 
+//Dashboard deadlines
+var greyscale;
 //Event Listeners
 //Get User details
 window.addEventListener('load', getSession);
+window.addEventListener('load', loadLayout);
+window.addEventListener('load', getAvailableApis);
 // window.addEventListener('load', loadPageSetIntervals);
 
 
@@ -46,6 +51,7 @@ function setGlobalVariables(session) {
     document.getElementById('greeting-firstname').textContent = userFirstName;
     lastfmUser = session.lastfmname;
     weatherLocation = session.city;
+    greyscale = session.greyscale;
     //Load API after variables are set
     loadPageSetIntervals();
   }
@@ -88,25 +94,37 @@ function createSignUpButton() {
 
 //setInterval
 function loadPageSetIntervals() {
-  getBBCNews();
+  getNews();
   getLastFMNowPlaying();
-  getGuardianNews();
   getWeather();
   getRandQuote();
+  updateDateTime();
+  if (!intervals) {
+    setInterval(getLastFMNowPlaying, 1000);
+    setInterval(getWeather, 300000);
+    setInterval(getRandQuote, 300000);
+    setInterval(getNews, 300000);
+    intervals = true;
+  }
+}
+function getNews() {
+  getBBCNews();
+  getBBCSport();
   getFourFourTwoNews();
   getTechCrunchNews();
-  updateDateTime();
-  setInterval(getBBCNews, 300000);
-  setInterval(getLastFMNowPlaying, 1000);
-  setInterval(getGuardianNews, 300000);
-  setInterval(getWeather, 600000);
-  setInterval(getRandQuote, 300000);
-  setInterval(getFourFourTwoNews, 300000);
-  setInterval(getTechCrunchNews, 300000);
+  getGuardianNews();
+  getGoogleNews();
+  getItalianFootballNews();
+  getFinancialTimesNews();
+  getWashingtonPostNews();
+  getCNNNews();
 }
 
 function getBBCNews() {
   getNewsApi('bbc-news', 'bbc-news-div');
+}
+function getBBCSport() {
+  getNewsApi('bbc-sport', 'bbc-sport-div');
 }
 function getGuardianNews() {
   getNewsApi('the-guardian-uk', 'guardian-news-div');
@@ -115,8 +133,25 @@ function getFourFourTwoNews() {
   getNewsApi('four-four-two', 'fourfourtwo-news-div');
 }
 function getTechCrunchNews() {
-  getNewsApi('techcrunch', 'tech-crunch-div')
+  getNewsApi('techcrunch', 'tech-crunch-div');
 }
+function getGoogleNews() {
+  getNewsApi('google-news', 'google-news-div');
+}
+function getItalianFootballNews() {
+  getNewsApi('football-italia', 'football-italia-div');
+}
+function getFinancialTimesNews() {
+  getNewsApi('financial-times', 'financial-time-div');
+}
+function getWashingtonPostNews() {
+  getNewsApi('the-washington-post', 'washington-post-div');
+}
+function getCNNNews() {
+  getNewsApi('cnn', 'cnn-div');
+}
+
+
 
 function getNewsApi(newsSource, divId) {
   var url = 'https://newsapi.org/v1/articles?source='+newsSource+
@@ -306,10 +341,122 @@ function loadQuoteToDashboard(quote) {
   div.appendChild(el);
 }
 
+function getAvailableApis() {
+  var xhr = new XMLHttpRequest();
+  var url = '/api/loadedApis';
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      loadAPISelectorSettings(JSON.parse(xhr.responseText));
+    }
+  }
+  xhr.send();
+}
 
+function loadAPISelectorSettings(apiList) {
+  console.log(apiList);
+  var contentSelector = document.getElementById('contentSelector');
+  var boxes = document.getElementsByClassName('dashboard-inner-box');
+  contentSelector.innerHTML = '';
+  for (var i = 0; i < 8; i++) {
+    var div = document.createElement('div');
+    div.classList.add('api-selector-div');
+    contentSelector.appendChild(div);
 
+    var h = document.createElement('h4');
+    h.textContent = "Dashboard Box: "+(i+1);
+    div.appendChild(h);
 
+    var select = document.createElement('select');
+    select.classList.add('api-selector');
+    select.dataset.boxNo = i;
+    div.appendChild(select);
 
+    var option = document.createElement('option');
+    option.setAttribute("hidden", "");
+    option.setAttribute("selected", "");
+    option.setAttribute("disabled", "");
+    option.textContent = "Choose API";
+    select.appendChild(option);
+
+    apiList.forEach(function (api) {
+      option = document.createElement('option');
+      option.value = api.htmlid;
+      option.textContent = api.name;
+      option.dataset.isNews = api.isNews;
+      option.style.textTransform = 'capitalize';
+      //If current option is equal to the id of the current dashboard box
+      // then make the current option selected
+      if (boxes[i].id == api.htmlid) {
+        option.setAttribute("selected", "");
+      }
+      select.appendChild(option);
+    });
+    document.getElementsByClassName('api-selector')[i].addEventListener("change", updateBoxApi);
+  }
+}
+
+function updateBoxApi(e) {
+  console.log(e.target.dataset.boxNo);
+  var boxNo = e.target.dataset.boxNo;
+  var boxes = document.getElementsByClassName('dashboard-inner-box');
+  var box = boxes[boxNo];
+  var isNews = e.target.dataset.isNews;
+  console.log(isNews);
+  console.log(box);
+  box.id = e.target.value;
+  if (isNews) {
+    if (!box.classList.contains('news-div')) {
+      box.classList.add('news-div');
+    }
+  } else {
+    if (box.classList.contains('news-div')) {
+      box.classList.remove('news-div');
+    }
+  }
+  boxNo = parseInt(boxNo)+1;
+  updateLayoutTable((boxNo), box.id);
+  loadPageSetIntervals();
+}
+
+function updateLayoutTable(boxNo, boxId) {
+  console.log(boxNo);
+  console.log(boxId);
+  var url = '/api/layout/'+boxNo;
+  var http = new XMLHttpRequest();
+  http.open('POST', url, true);
+  http.setRequestHeader('Content-Type','application/json');
+  console.log(http.status);
+  console.log(http.onload);
+  http.onload = function() {
+    console.log(http.status);
+    if (http.status == 200) {
+    }
+  };
+  http.send(JSON.stringify(  {
+      boxid: boxId
+    }
+  ));
+}
+
+function loadLayout() {
+  var xhr = new XMLHttpRequest();
+  var url = '/api/layout';
+  xhr.open('GET', url, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      layoutAddIdToBoxes(JSON.parse(xhr.responseText));
+    }
+  }
+  xhr.send();
+}
+
+function layoutAddIdToBoxes(layout) {
+  var boxes = document.getElementsByClassName('dashboard-inner-box');
+  for (var i = 0; i < layout.length; i++) {
+    boxes[i].id = layout[i].boxId;
+  }
+}
 
 
 

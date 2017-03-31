@@ -28,14 +28,9 @@ if(deadlinePage) {
  */
 function loadDeadlines() {
   var url = '/api/deadlines';
-  //If page is not deadlines, limit to 4
-  // if(!deadlinePage) {
-  // url += '?limit=' + 4;
-  // }
   if (deadlinePage) {
     url += '?order=' + document.getElementById('sort-deadlines').value;
   }
-  //if (currentSearch) url += '&title=' + encodeURIComponent(currentSearch);
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.onload = function() {
@@ -514,7 +509,7 @@ function submitEditDeadlineForm() {
             date: editDate.value
           }
       ));
-      }
+    }
 }
 
 function datetimeToString(datetime, returnAsPrintableString) {
