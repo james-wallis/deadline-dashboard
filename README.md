@@ -76,9 +76,15 @@ Through using last fm you can display your currently playing song on last fm, bu
 
 [Add Spotify to Last FM](https://support.spotify.com/us/using_spotify/playlists/scrobble-to-last-fm/)
 
-About the Dashboard
---------------
+## About the Dashboard
 
-The Dashboard is designed for one user and one user only. Adding more than one user to the database will not change anything in the dashboard.
+
+The Dashboard is _currently_ designed for one user and one user only. Adding more than one user to the database will not change anything in the dashboard.
 It has been designed for personal use outside of its coursework origins. I intend to use it as either a new tab page for chrome or a dashboard in my bedroom.
 Its major purpose is to tell me my upcoming deadlines and also to keep me updated with the news, displaying the weather and telling me what my spotify is playing.
+
+### Coursework Reflection
+
+#### Functionality
+
+> How appropriate is the design?  Does it all work?  How much does it do?  How much is your own work as opposed to libraries? 
