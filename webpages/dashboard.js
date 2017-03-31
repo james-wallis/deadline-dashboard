@@ -27,7 +27,9 @@ window.addEventListener('load', getAvailableApis);
 
 
 
-
+/**
+ * Function to get the user details for use with the global variables
+ */
 function getSession() {
   var url = '/api/user';
   var xhr = new XMLHttpRequest();
@@ -40,8 +42,11 @@ function getSession() {
   xhr.send();
 }
 
+/**
+ * Function to add the user details to global variables
+ * @param session, contains the user details from the database
+ */
 function setGlobalVariables(session) {
-  console.log(session);
   if(isEmptyObject(session)) {
     document.getElementById('container').innerHTML = '';
     createSignUpButton();
@@ -56,6 +61,9 @@ function setGlobalVariables(session) {
   }
 }
 
+/**
+ * Function to check whether an object is empty
+ */
 function isEmptyObject(obj) {
   for (var key in obj) {
     return false;
@@ -63,6 +71,10 @@ function isEmptyObject(obj) {
   return true;
 }
 
+/**
+ * Function to create the sign up button which is run if there
+ * is no users in the user table
+ */
 function createSignUpButton() {
   document.getElementById('settings-icon').style.display = "none";
   var container = document.getElementById('container');
@@ -91,7 +103,9 @@ function createSignUpButton() {
 
 }
 
-//setInterval
+/**
+ * function to load all api's and set intervals for their refresh
+ */
 function loadPageSetIntervals() {
   getNews();
   getLastFMNowPlaying();
@@ -106,6 +120,10 @@ function loadPageSetIntervals() {
     intervals = true;
   }
 }
+
+/**
+ * Function to get all news apis from newsAPI.org
+ */
 function getNews() {
   getBBCNews();
   getBBCSport();
@@ -119,39 +137,81 @@ function getNews() {
   getCNNNews();
 }
 
+/**
+ * Function to get the BBC News from newsAPI.org
+ */
 function getBBCNews() {
   getNewsApi('bbc-news', 'bbc-news-div');
 }
+
+/**
+ * Function to get the BBC Sport from newsAPI.org
+ */
 function getBBCSport() {
   getNewsApi('bbc-sport', 'bbc-sport-div');
 }
+
+/**
+ * Function to get the guardian from newsAPI.org
+ */
 function getGuardianNews() {
   getNewsApi('the-guardian-uk', 'guardian-news-div');
 }
+
+/**
+ * Function to get the FourFourTwo from newsAPI.org
+ */
 function getFourFourTwoNews() {
   getNewsApi('four-four-two', 'fourfourtwo-news-div');
 }
+
+/**
+ * Function to get the tech crunch News from newsAPI.org
+ */
 function getTechCrunchNews() {
   getNewsApi('techcrunch', 'tech-crunch-div');
 }
+
+/**
+ * Function to get the google news from newsAPI.org
+ */
 function getGoogleNews() {
   getNewsApi('google-news', 'google-news-div');
 }
+
+/**
+ * Function to get the italian football news from newsAPI.org
+ */
 function getItalianFootballNews() {
   getNewsApi('football-italia', 'football-italia-div');
 }
+
+/**
+ * Function to get the financial-times news from newsAPI.org
+ */
 function getFinancialTimesNews() {
   getNewsApi('financial-times', 'financial-time-div');
 }
+
+/**
+ * Function to get the washington post from newsAPI.org
+ */
 function getWashingtonPostNews() {
   getNewsApi('the-washington-post', 'washington-post-div');
 }
+
+/**
+ * Function to get the CNN News from newsAPI.org
+ */
 function getCNNNews() {
   getNewsApi('cnn', 'cnn-div');
 }
 
-
-
+/**
+ * Function to get news from newsAPI.org
+ * @param the newsSource, needed to load the api
+ * @param the divId, the id of the div to load the data to
+ */
 function getNewsApi(newsSource, divId) {
   var url = 'https://newsapi.org/v1/articles?source='+newsSource+
             '&sortBy=top&apiKey='+newsapiKey;
@@ -169,6 +229,11 @@ function getNewsApi(newsSource, divId) {
   xhr.send();
 }
 
+/**
+ * Function to load the news to the dashboard
+ * @param news, the list of news articles from newsAPI.org
+ * @param divId, the id of the div to load the news articles to
+ */
 function loadNewsToDashboard(news, divId) {
   var newsDiv = document.getElementById(divId);
   newsDiv.classList.add('news-div');
@@ -189,6 +254,9 @@ function loadNewsToDashboard(news, divId) {
   }
 }
 
+/**
+ * Function to get the current playing track of the specified user
+ */
 function getLastFMNowPlaying() {
   var lastfmGetRecentTracksURL =
         'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
@@ -207,6 +275,9 @@ function getLastFMNowPlaying() {
   xhr.send();
 }
 
+/**
+ * Function to load the current playing track to the dashboard
+ */
 function loadLastFMToDashboard(music) {
   var lastfmDiv = document.getElementById('last-fm-div');
   lastfmDiv.innerHTML = '';
@@ -239,6 +310,9 @@ function loadLastFMToDashboard(music) {
     }
 }
 
+/**
+ * Function to get the current weather of the users specified city from openweathermap
+ */
 function getWeather() {
   var xhr = new XMLHttpRequest();
   var url = 'http://api.openweathermap.org/data/2.5/weather?q='
@@ -257,6 +331,9 @@ function getWeather() {
   xhr.send();
 }
 
+/**
+ * Function to print the weather to the dashboard
+ */
 function loadWeatherToDashboard(weather) {
   var weatherDiv = document.getElementById('weather-div');
   weatherDiv.innerHTML = '';
@@ -300,10 +377,11 @@ function loadWeatherToDashboard(weather) {
   el.textContent = 'Sunset: '+sunset.getHours()+':'+sunset.getMinutes()+' PM';
   div.appendChild(el);
 
-  // getWeatherIcon(weather.weather[0].main);
 }
 
-
+/**
+ * Function to get a random quote
+ */
 function getRandQuote() {
   var xhr = new XMLHttpRequest();
   var url = 'http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1;'
@@ -320,10 +398,10 @@ function getRandQuote() {
   xhr.send();
 }
 
+/**
+ * Function to add a random quote to the dashboard
+ */
 function loadQuoteToDashboard(quote) {
-  console.log(quote[0]);
-  console.log(quote[0].title);
-  console.log(quote[0].content);
   var quoteDiv = document.getElementById('quote-div');
   quoteDiv.innerHTML = '';
 
@@ -352,8 +430,11 @@ function getAvailableApis() {
   xhr.send();
 }
 
+/**
+ * Function to load the available apis to the api selection list inside settings
+ * @param apiList, the list of available api's
+ */
 function loadAPISelectorSettings(apiList) {
-  console.log(apiList);
   var contentSelector = document.getElementById('contentSelector');
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   contentSelector.innerHTML = '';
@@ -395,14 +476,14 @@ function loadAPISelectorSettings(apiList) {
   }
 }
 
+/**
+ * Function to change what content is shown in the boxes on the dashboard
+ */
 function updateBoxApi(e) {
-  console.log(e.target.dataset.boxNo);
   var boxNo = e.target.dataset.boxNo;
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   var box = boxes[boxNo];
   var isNews = e.target.dataset.isNews;
-  console.log(isNews);
-  console.log(box);
   box.id = e.target.value;
   if (isNews) {
     if (!box.classList.contains('news-div')) {
@@ -418,17 +499,15 @@ function updateBoxApi(e) {
   loadPageSetIntervals();
 }
 
+/**
+ * Function to update the layout table with the new layout of the dashboard
+ */
 function updateLayoutTable(boxNo, boxId) {
-  console.log(boxNo);
-  console.log(boxId);
   var url = '/api/layout/'+boxNo;
   var http = new XMLHttpRequest();
   http.open('POST', url, true);
   http.setRequestHeader('Content-Type','application/json');
-  console.log(http.status);
-  console.log(http.onload);
   http.onload = function() {
-    console.log(http.status);
     if (http.status == 200) {
     }
   };
@@ -438,6 +517,9 @@ function updateLayoutTable(boxNo, boxId) {
   ));
 }
 
+/**
+ * Function to load the layout, runs on page load
+ */
 function loadLayout() {
   var xhr = new XMLHttpRequest();
   var url = '/api/layout';
@@ -450,6 +532,9 @@ function loadLayout() {
   xhr.send();
 }
 
+/**
+ * Function to add the correct id to the correct box to display api's
+ */
 function layoutAddIdToBoxes(layout) {
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   for (var i = 0; i < layout.length; i++) {
@@ -459,27 +544,17 @@ function layoutAddIdToBoxes(layout) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Time functions -- need to be added to an export
+/**
+ * Time functions for the dashboard
+ * These were meant to be exported but I ran out of time so they are here
+ * After coureswork submission this will be changed so that they are exported
+ */
 
 var timerSet = false;
 
+/**
+ * Function to update the date and time on the dashboard
+ */
 function updateDateTime() {
   var date = new Date();
   showCurrentTime(date);
@@ -491,6 +566,10 @@ function updateDateTime() {
     timerSet = true;
   }
 }
+/**
+ * Function to show the current time on the dashboard
+ * @param date, the date for the dashboard
+ */
 function showCurrentTime(date) {
     var hours = date.getHours();
     var minutes = date.getMinutes();
@@ -502,6 +581,10 @@ function showCurrentTime(date) {
     document.getElementById('currentTime').textContent = stringTime;
 }
 
+/**
+ * Function to show the current time of day on the dashboard
+ * @param date, the date for the dashboard
+ */
 function showTimeOfDay(date) {
   var hours = date.getHours();
   var timeOfDay;
@@ -517,18 +600,31 @@ function showTimeOfDay(date) {
   document.getElementById('timeOfDay').textContent = timeOfDay;
 }
 
+/**
+ * Function to show the day of the week on the dashboard
+ * @param date, the date for the dashboard
+ */
 function showDayOfTheWeek(date) {
   var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var day = days[ date.getDay() ];
   document.getElementById('dayOfTheWeek').textContent = day;
 }
 
+/**
+ * Function to show the month on the dashboard
+ * @param date, the date for the dashboard
+ */
 function showDateMonth(date) {
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var month = months[ date.getMonth() ];
   var formattedDate = (date.getDate()+formatDate(date.getDate));
   document.getElementById('dateMonth').textContent = (formattedDate + " " + month);
 }
+
+/**
+ * Function to format the date so that it has the correct ending
+ * @param date, the date for the dashboard
+ */
 function formatDate(date) {
   if(date>3 && date<21) return 'th';
   switch (date % 10) {

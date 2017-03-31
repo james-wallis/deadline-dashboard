@@ -83,6 +83,12 @@ The Dashboard is _currently_ designed for one user and one user only. Adding mor
 It has been designed for personal use outside of its coursework origins. I intend to use it as either a new tab page for chrome or a dashboard in my bedroom.
 Its major purpose is to tell me my upcoming deadlines and also to keep me updated with the news, displaying the weather and telling me what my Spotify is playing.
 
+### Actors/Users
+
+The dashboard is designed to be used in a personal space. In the future it will be used by a developer to do what they want with it and the will be able to understand what function does what as the code is clear in most places.
+
+It could be expanded to other end users, but this would require more implementation to have multiple users and also need an easy way to add more api's to the dashboard whilst also being able to easily change stylings to their taste.
+
 ## Coursework Reflection
 
 ### Functionality
