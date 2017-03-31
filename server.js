@@ -24,7 +24,8 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-/**bodyParser.json(options)
+/**
+ * bodyParser.json(options)
  * Parses the text as JSON and exposes the resulting object on req.body.
  */
 app.use(bodyParser.json());

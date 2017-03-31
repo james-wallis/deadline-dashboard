@@ -1,4 +1,4 @@
-/* Responsive Styles */
+/* RESPONSIVE STYLES */
 .col-1 {width: 8.33%;}
 .col-2 {width: 16.66%;}
 .col-3 {width: 25%;}
@@ -16,14 +16,14 @@
     float: left;
     padding: 15px;
 }
-
 .row::after {
     content: "";
     clear: both;
     display: table;
 }
+/* responsive styles end */
 
-/* Visual Styling */
+/* GENERAL STYLING */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -45,6 +45,38 @@ p {
 main, aside {
   background-color: #212227;
 }
+main {
+  height: 100%;
+  padding: 0 !important;
+}
+aside {
+  border-left: 2px solid #868784;
+  height: 100%;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #D2D4C8;
+  font-weight: 300;
+}
+h1 {
+  font-size: 42px;
+}
+h2 {
+  font-size: 30px;
+  color: #D2D4C8;
+}
+main h4 {
+  text-align: center;
+  color: #D2D4C8;
+  padding-bottom: 5px;
+  font-size: 26px;
+  text-transform: uppercase;
+}
+/* General Styling End */
+
+
+/* MAIN DASHBOARD STYLES */
 #dashboard-welcome-container {
   display: flex;
   align-items: center;
@@ -79,27 +111,9 @@ main, aside {
 .datetime {
   color: #868784;
 }
-main {
-  height: 100%;
-  padding: 0 !important;
-}
-aside {
-  border-left: 2px solid #868784;
-  height: 100%;
-}
+/* main dashboard styles end */
 
-h1, h2 {
-  text-align: center;
-  color: #D2D4C8;
-  font-weight: 300;
-}
-h1 {
-  font-size: 42px;
-}
-h2 {
-  font-size: 30px;
-  color: #D2D4C8;
-}
+/* DASHBOARD DEADLINES STYLING */
 #all-deadlines-button {
   text-decoration: none;
   color: #868784;
@@ -134,12 +148,74 @@ h2 {
 .deadline p {
   padding: 3px;
 }
+/* dashboard deadline styling end */
 
+/* INDIVIDUAL STYLES FOR EACH API SHOWN ON THE DASHBOARD */
+.news-div {
+  padding: 2% 4%;
+}
+.news-div p {
+  padding: 1% 0;
+  text-align: center;
+  color: #868784;
+  border-bottom: 1px dotted #3F4045;
+}
+.news-div p:last-child {
+  border: 0;
+}
+#last-fm-div {
+  padding: 2% 0;
+}
+#last-fm-div h5 {
+  font-size: 16px;
+  color: #3F4045;
+  text-align: center;
+  margin-top: 2%;
+}
+#last-fm-div p {
+  padding: 1% 2%;
+  text-align: center;
+  color: #868784;
+  font-size: 20px;
+  text-transform: capitalize;
+}
+#last-fm-div img {
+  display: block;
+  margin: 0 auto;
+}
+#weather-div {
+  padding: 2% 4%;
+}
+#weather-div h5 {
+  color: #D2D4C8;
+  text-align: center;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.weather-stats {
+  color: #868784;
+  text-align: center;
+  text-transform: capitalize;
+  font-weight: normal;
+  margin: 1%;
+}
+.weather-container {
+  margin-top: 3%;
+}
+#weather-div p {
+  color: #3F4045;
+  margin: 3%;
+}
+#quote-div {
+  padding: 2% 0;
+}
+#quote-div p {
+  margin: 3% 2%;
+  color: #868784;
+}
+/* Individual api styling end */
 
-
-
-
-/* Styling for the settings menu */
+/* SETTINGS MENU STYLES */
 #settings-icon {
   width: 10px;
   height: 100%;
@@ -159,7 +235,6 @@ h2 {
   transition: all 0.2s;
   cursor: pointer;
 }
-
 #settings-container {
   height: 100%;
   width: 100%;
@@ -243,13 +318,13 @@ h2 {
 .api-selector-div h4 {
   font-weight: lighter;
 }
+/* settings styles end */
 
 
 
 
 
-
-
+/* STYLING FOR DEADLINES.HTML */
 #all-deadlines-menu {
   border-left: 2px solid #868784;
   height: 80%;
@@ -296,92 +371,9 @@ h2 {
   border: 2px solid white;
   font-weight: bold;
 }
+/* styling for deadlines.html end */
 
-
-/* Dashboard API Boxes Styling */
-main h4 {
-  text-align: center;
-  color: #D2D4C8;
-  padding-bottom: 5px;
-  font-size: 26px;
-  text-transform: uppercase;
-}
-
-.news-div {
-  padding: 2% 4%;
-}
-.news-div p {
-  padding: 1% 0;
-  text-align: center;
-  color: #868784;
-  border-bottom: 1px dotted #3F4045;
-}
-.news-div p:last-child {
-  border: 0;
-}
-
-#last-fm-div {
-  padding: 2% 0;
-}
-/*#last-fm-div h4 {
-  text-align: center;
-  color: #D2D4C8;
-  padding-bottom: 5px;
-  font-size: 30px;
-}*/
-#last-fm-div h5 {
-  font-size: 16px;
-  color: #3F4045;
-  text-align: center;
-  margin-top: 2%;
-}
-#last-fm-div p {
-  padding: 1% 2%;
-  text-align: center;
-  color: #868784;
-  font-size: 20px;
-  text-transform: capitalize;
-}
-#last-fm-div img {
-  display: block;
-  margin: 0 auto;
-}
-
-#weather-div {
-  padding: 2% 4%;
-}
-#weather-div h5 {
-  color: #D2D4C8;
-  text-align: center;
-  font-size: 16px;
-  text-transform: uppercase;
-}
-.weather-stats {
-  color: #868784;
-  text-align: center;
-  text-transform: capitalize;
-  font-weight: normal;
-  margin: 1%;
-}
-.weather-container {
-  margin-top: 3%;
-}
-#weather-div p {
-  color: #3F4045;
-  margin: 3%;
-}
-
-#quote-div {
-  padding: 2% 0;
-}
-#quote-div p {
-  margin: 3% 2%;
-  color: #868784;
-}
-
-
-
-/* Add user class for container */
+/* REDIRECT TO USER CREATION STYLES FOR DASHBOARD */
 .sign-up-button-div {
   display: flex;
   align-items: center;
@@ -408,8 +400,9 @@ main h4 {
   color: #868784;
   cursor: pointer;
 }
+/* redirect to user creation styles end */
 
-/*add user page*/
+/* ADD USER PAGE STYLES */
 #outer-div-sign-up {
   display: flex;
   align-items: center;
@@ -449,3 +442,4 @@ main h4 {
   display: block;
   color: #D2D4C8;
 }
+/* Add user styles end */
