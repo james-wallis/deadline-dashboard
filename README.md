@@ -56,14 +56,10 @@ To get the dashboard running, you must install the source code and all modules a
 6. Start the server by typing:
 
   ```bash
-  npm run forever
+  npm run dashboard
   ```
 
   This ensures that if you edit the code (or upload a new version), the server will restart.
 
 5. Visit your website.
     * If you're on your VM you just need to put your VM's IP address into a browser, or if you're developing on a desktop machine it will be http://127.0.0.1:8080 .
-
-Git: A recommendation
-----------------------
-If at all possible, we recommend you use git to download code rather than zips of a repository.  This is preferable because if the repo is updated, then syncing those changes requires just one command (`git pull`) and usually any merging can be done automatically.  Git is very powerful and we heartily encourages you to become familiar with it.
