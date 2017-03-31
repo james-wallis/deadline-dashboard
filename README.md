@@ -165,7 +165,7 @@ Hopefully the above helps a vast amount with my reflection on the project but if
 
 * **Unfixed Error**: The dashboard currently runs all getApi functions for the dashboard no matter if the api is currently being used or not. Not only does this create mass errors in the console, but it also hinders the performance of the program. This is an urgent error that needs to be fixed, however it also fell into the category or 'running out of time' on this occasion.
 
-* **Bad Practive**: Currently, the dashboard does not do a great amount to validate forms (in some cases none). This obviously needs to be fixed and all forms should have a lot of validation so that the user can enter nothing which will break the system or cause it not to work properly.
+* **Bad Practice**: Currently, the dashboard does not do a great amount to validate forms (in some cases none). This obviously needs to be fixed and all forms should have a lot of validation so that the user can enter nothing which will break the system or cause it not to work properly.
 
 * The code quality could be better, I should be able to use more ECMAScript 6 functionality to make the code more concise and readable. Furthermore the comments could be more descriptive, although at the moment I feel that they are able to describe what a function does clearly.
 
