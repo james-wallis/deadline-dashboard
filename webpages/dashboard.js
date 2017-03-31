@@ -22,7 +22,6 @@ var greyscale;
 window.addEventListener('load', getSession);
 window.addEventListener('load', loadLayout);
 window.addEventListener('load', getAvailableApis);
-// window.addEventListener('load', loadPageSetIntervals);
 
 
 
