@@ -83,9 +83,9 @@ The Dashboard is _currently_ designed for one user and one user only. Adding mor
 It has been designed for personal use outside of its coursework origins. I intend to use it as either a new tab page for chrome or a dashboard in my bedroom.
 Its major purpose is to tell me my upcoming deadlines and also to keep me updated with the news, displaying the weather and telling me what my spotify is playing.
 
-### Coursework Reflection
+## Coursework Reflection
 
-#### Functionality
+### Functionality
 
 > How appropriate is the design?  Does it all work?  How much does it do?  How much is your own work as opposed to libraries?
 
@@ -109,7 +109,7 @@ _Areas for improvement_
 * The ability to see passed deadlines as well as mark them as completed.
 * Functionality to display when there is less than a week until a deadline.
 
-##### Maintainability
+### Maintainability
 
 > Code style, comprehensibility and maintainability. This includes formatting, file structure, naming - everything that can help your work live on and be useful after it is graded, including how well the code and any documentation communicates any concepts necessary to understand the architecture and configuration of the system.
 
@@ -124,7 +124,7 @@ _Areas for improvement_
 * Comments could be made better and more informative in places
 * File structure needs a revamp
 
-#### Usability
+### Usability
 
 > Ease-of-use of your system, including the use of event-driven input, background refresh, drag and drop, intuitive UI design, etc.
 
