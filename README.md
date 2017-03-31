@@ -1,9 +1,9 @@
-#deadline-dashboard
+# deadline-dashboard
 
 
 The deadline-dashboard for my second year WebScript coursework.
 
-##Web Application Brief
+## Web Application Brief
 
 
 Your challenge is to create a Configurable Dashboard.
@@ -26,7 +26,7 @@ Critically evaluate the design and implementation of web applications.
 
 
 
-##Running the dashboard
+## Running the dashboard
 
 
 To get the dashboard running, you must install the source code and all modules and then run the server from the command line:
@@ -64,7 +64,7 @@ To get the dashboard running, you must install the source code and all modules a
 5. Visit your website.
     * If you're on your VM you just need to put your VM's IP address into a browser, or if you're developing on a desktop machine it will be http://127.0.0.1:8080.
 
-###Use of Last FM
+### Use of Last FM
 
 
 The Dashboard takes in a users lastfm username so it is ideal if you create one before you start the dashboard for the first time.
