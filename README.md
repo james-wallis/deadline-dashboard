@@ -29,23 +29,13 @@ Critically evaluate the design and implementation of web applications.
 Running the dashboard
 ----------------
 
-To get the example running, you must install the source code and all modules and then run the server from the command line:
+To get the dashboard running, you must install the source code and all modules and then run the server from the command line:
 
-1. To download the code, either use git (the simplest option):
+1. To download the code, use git (the simplest option):
 
   ```bash
-  git clone https://github.com/portsoc/ws_api.git
-  cd ws_api
-  ```
-  or download and unpack the [zip](https://github.com/portsoc/ws_api/archive/master.zip)
-  which on linux can be achieved using
-  ```bash
-  wget https://github.com/portsoc/ws_api/archive/master.zip
-  ```
-  then
-  ```bash
-  unzip master.zip
-  cd ws_api-master
+  git clone https://github.com/jamesemwallis/deadline-dashboard.git
+  cd deadline-dashboard
   ```
 
 2. To download any libraries the code uses, type:
@@ -57,8 +47,8 @@ To get the example running, you must install the source code and all modules and
 3. Install and run MySQL.
     * If you're using your VM for this, MySQL is already installed and running.
 
-4. Edit `examples/sql_config.json` so that your database `host`, `user` and `password` properties are correct.
-    * The defaults should work on your VM.
+4. Edit `sql_config.json` so that your database `host`, `user` and `password` properties are correct.
+    * The defaults may not work on your VM, as this project is mostly run from a different server.
 
 5. Install the database and tables using: `npm run initsql`
     * If your `host` and `user` differ from the defaults, you may need to update `package.json` for the `initsql` script to work.
