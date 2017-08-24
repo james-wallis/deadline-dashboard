@@ -30,7 +30,7 @@ function addUser(e) {
           time = document.getElementById('time').checked,
           greyscale = document.getElementById('greyscale').checked;
           console.log(firstname);
-      var url = '/api/user';
+      var url = '/api/addUser';
       var http = new XMLHttpRequest();
       console.log(url);
       http.open('POST', url, true);
@@ -69,7 +69,7 @@ function introduction(firstname) {
   var div = document.createElement('div');
   div.classList.add('introduction');
   container.appendChild(div);
-  
+
   var el = document.createElement('p');
   el.textContent = 'Just a few things to start off. The dashboard can  \
                     be used to view the news, your current lastfm/spotify \

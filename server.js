@@ -38,7 +38,7 @@ app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.
 
 // server api
 //   GET  /api/user          - get variables used for a session, username, city for weather
-//   POST /api/user          - Add a new user, only called once as the program has one user
+//   POST /api/addUser          - Add a new user, only called once as the program has one user
 //   GET  /api/deadlines     - list deadlines ordered by time from most recent, returns [like above, like above, ...]
 //         ?order=...        - on the dashboard page ordered by closest date, on the deadline page changes depending on what the user wants
 //   POST /api/deadlines     - upload a new deadline, its title, desc and its due date, returns {id: ..., title: ..., desc: ..., duedate...}
@@ -51,7 +51,7 @@ app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.
 //   GET  /api/layout        - Gets the list of the current layout used to assign the correct id's to the correct divs
 //   POST /api/layout/:boxno - Updates the layout table, uses the boxno to find the correct element in the table
 app.get('/api/user', sendSessionVariables);
-app.post('/api/user', addUser);
+app.post('/api/addUser', addUser);
 app.get('/api/deadlines', sendDeadlines);
 app.post('/api/deadlines', uploadDeadline);
 app.post('/api/deadlines/:id', updateDeadline);
