@@ -8,13 +8,22 @@ var mysql = require('mysql');
 var bodyParser = require('body-parser');
 var sqlConfig = require('./sql_config.json');
 var sql = mysql.createConnection(sqlConfig.mysql);
-var app = express();
 
-// constants for directories
-var webpages = __dirname + '/webpages/';
+//Setup Express and Socket.io
+var app     = express();
+// var port = process.env.PORT || 8080
+var server  = app.listen(8080);
+var io      = require('socket.io').listen(server);
 
-// static files
+// Constant page directory
+var webpages = __dirname + '/webpages/html';
+var stylesheet = __dirname + '/webpages/css';
+var script = __dirname + '/webpages/js';
+
+// Static files
 app.use('/', express.static(webpages, { extensions: ['html'] }));
+app.use('/', express.static(stylesheet, { extensions: ['css'] }));
+app.use('/', express.static(script, { extensions: ['js'] }));
 
 /** bodyParser.urlencoded(options)
  * Parses the text as URL encoded data (which is how browsers tend to send form data from regular forms set to POST)
@@ -34,6 +43,20 @@ app.use(bodyParser.json());
 
 // logging in order to fully understand what the API is doing
 app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.url); next(); });
+
+// Socket.io
+io.on('connection', function(socket){
+  console.log('a user connected');
+  sendSessionVariables();
+  getLayout();
+  sendApis();
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+
+});
+
+
 
 
 // server api
@@ -63,11 +86,7 @@ app.get('/api/loadedApis', sendApis);
 app.get('/api/layout', getLayout);
 app.post('/api/layout/:boxno', updateLayout);
 
-// start the server
-app.listen(8080);
-
-/* server functions
- * (Thanks for this!)
+/*
  *
  *
  *    ####  ###### #####  #    # ###### #####     ###### #    # #    #  ####  ##### #  ####  #    #  ####
@@ -85,7 +104,7 @@ app.listen(8080);
  * @return the session variables such as first name, last name, lastFmname,
  *         city for weather, time format, and greyscale for the deadlines
  */
-function sendSessionVariables(req, res) {
+function sendSessionVariables() {
   //Get user details from user table
   var query = 'SELECT userFirstName, userLastName, userLastFMName, \
                userCity, user24hrTime, userDeadlineGrayScale FROM user';
@@ -105,7 +124,7 @@ function sendSessionVariables(req, res) {
        greyscale : r.userDeadlineGrayScale
      };
    }
-   res.json(session);
+   io.emit('sessionVariables', session);
  });
 }
 
@@ -305,7 +324,7 @@ function deleteUnit(req, res) {
  * Function to send the list of apis
  * @return the list of apis
  */
-function sendApis(req, res) {
+function sendApis() {
   var apiList = [];
   // prepare query
   var query = 'SELECT id, apiName, apiId, fromNewsApi FROM apis';
@@ -320,7 +339,7 @@ function sendApis(req, res) {
         isNews: row.fromNewsApi
       });
     });
-    res.json(apiList);
+    io.emit('apis', apiList);
   });
 }
 
@@ -328,7 +347,7 @@ function sendApis(req, res) {
  * Function to get the saved layout of the dashboard
  * Used to add each id to the dashboard
  */
-function getLayout(req, res) {
+function getLayout() {
   var layout = [];
   // prepare query
   var query = 'SELECT boxNo, boxId FROM layout';
@@ -341,7 +360,7 @@ function getLayout(req, res) {
         boxId: row.boxId
       });
     });
-    res.json(layout);
+    io.emit('layout', layout);
   });
 }
 

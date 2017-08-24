@@ -19,9 +19,11 @@ var weatherLocation;
 var greyscale;
 //Event Listeners
 //Get User details
-window.addEventListener('load', getSession);
-window.addEventListener('load', loadLayout);
-window.addEventListener('load', getAvailableApis);
+
+//Socket.io functions
+socket.on('sessionVariables', setGlobalVariables);
+socket.on('layout', layoutAddIdToBoxes);
+socket.on('apis', loadAPISelectorSettings);
 
 
 
@@ -30,23 +32,24 @@ window.addEventListener('load', getAvailableApis);
 /**
  * Function to get the user details for use with the global variables
  */
-function getSession() {
-  var url = '/api/user';
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      setGlobalVariables(JSON.parse(xhr.responseText));
-    }
-  }
-  xhr.send();
-}
+// function getSession() {
+//   var url = '/api/user';
+//   var xhr = new XMLHttpRequest();
+//   xhr.open('GET', url, true);
+//   xhr.onload = function() {
+//     if (xhr.status === 200) {
+//       setGlobalVariables(JSON.parse(xhr.responseText));
+//     }
+//   }
+//   xhr.send();
+// }
 
 /**
  * Function to add the user details to global variables
  * @param session, contains the user details from the database
  */
 function setGlobalVariables(session) {
+  console.log(session);
   if(isEmptyObject(session)) {
     document.getElementById('container').innerHTML = '';
     createSignUpButton();
@@ -435,6 +438,7 @@ function getAvailableApis() {
  * @param apiList, the list of available api's
  */
 function loadAPISelectorSettings(apiList) {
+  console.log(apiList);
   var contentSelector = document.getElementById('contentSelector');
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   contentSelector.innerHTML = '';
@@ -518,24 +522,10 @@ function updateLayoutTable(boxNo, boxId) {
 }
 
 /**
- * Function to load the layout, runs on page load
- */
-function loadLayout() {
-  var xhr = new XMLHttpRequest();
-  var url = '/api/layout';
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      layoutAddIdToBoxes(JSON.parse(xhr.responseText));
-    }
-  }
-  xhr.send();
-}
-
-/**
  * Function to add the correct id to the correct box to display api's
  */
 function layoutAddIdToBoxes(layout) {
+  console.log(layout);
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   for (var i = 0; i < layout.length; i++) {
     boxes[i].id = layout[i].boxId;
