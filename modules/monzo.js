@@ -79,19 +79,23 @@ function passGlobals(newApp, newIO, newClient, newRequest) {
 }
 
 function getMonzoBalance() {
-  monzoBank.balance(monzoAccountId, monzoAccessToken, function(err, value) {
-    if (err) {
-      if (err.error.code == 'bad_request.missing_param.account_id') {
-        console.log('wor');
+  if (!monzoAccountId || !monzoAccessToken) {
+    io.emit('showMonzoLogin');
+  } else {
+    monzoBank.balance(monzoAccountId, monzoAccessToken, function(err, value) {
+      if (err) {
+        if (err.error.code == 'bad_request.missing_param.account_id') {
+          console.log('wor');
+        } else {
+          console.log('error getting monzo balance');
+          console.log(err);
+        }
       } else {
-        console.log('error getting monzo balance');
-        console.log(err);
+        io.emit('monzoBalance', value);
       }
-    } else {
-      io.emit('monzoBalance', value);
-    }
-    console.log(value);
-  });
+      console.log(value);
+    });
+  }
 }
 
 //Export functions

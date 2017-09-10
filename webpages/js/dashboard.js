@@ -389,6 +389,7 @@ socket.on('apis', loadAPISelectorSettings);
 socket.on('lastfmNowPlaying', showLastfmNowPlaying);
 socket.on('weather', loadWeatherToDashboard);
 socket.on('monzoBalance', showMonzoAccountBalance);
+socket.on('showMonzoLogin', showMonzoLogin);
 
 
 
@@ -399,23 +400,25 @@ socket.on('monzoBalance', showMonzoAccountBalance);
  * Function to add a link to the Monzo Authorisation page
  * Will be overwritten is user is already logged in
  */
-function showMonzoAuthorise() {
+function showMonzoLogin() {
   var monzoBalanceDiv = document.getElementById('monzo-balance-div');
-  monzoBalanceDiv.innerHTML = '';
-  var h = document.createElement('h4');
-  h.textContent = 'Monzo';
-  monzoBalanceDiv.appendChild(h);
-  var p = document.createElement('p');
-  p.textContent = 'Please authorise your account';
-  monzoBalanceDiv.appendChild(p);
-  p = document.createElement('p');
-  p.textContent = 'to be used with this application';
-  monzoBalanceDiv.appendChild(p);
-  var a = document.createElement('a');
-  a.textContent = 'Authorisation';
-  a.href = '/auth/monzo';
-  monzoBalanceDiv.appendChild(a);
-
+  if (!!monzoBalanceDiv) {
+    monzoBalanceDiv.innerHTML = '';
+    var h = document.createElement('h4');
+    h.textContent = 'Monzo';
+    monzoBalanceDiv.appendChild(h);
+    var p = document.createElement('p');
+    p.textContent = 'Please authorise your account';
+    monzoBalanceDiv.appendChild(p);
+    p = document.createElement('p');
+    p.textContent = 'to be used with this application';
+    monzoBalanceDiv.appendChild(p);
+    var a = document.createElement('a');
+    a.textContent = 'Authorisation';
+    a.href = '/auth/monzo';
+    a.style.cssText = 'text-align: center; display: block';
+    monzoBalanceDiv.appendChild(a);
+  }
 }
 
 /**

@@ -1,7 +1,9 @@
 /*
  * An API which serves as a configurable dashboard.
  */
-
+ process.on('uncaughtException', function (err) {
+     console.log(err);
+ });
 'use static'
 var express = require('express');
 var mysql = require('mysql');
@@ -66,7 +68,7 @@ io.on('connection', function(socket){
   sendSessionVariables();
   sendLayout();
   sendApis();
-
+  setListeners();
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
@@ -75,7 +77,9 @@ io.on('connection', function(socket){
 });
 
 //Do when server starts
-setListeners();
+// For now do this on client connection as I need to set up a way to get
+//          session variables and send them in different functions
+// setListeners();
 
 
 
@@ -127,16 +131,6 @@ function sendSessionVariables() {
  });
 }
 
-
-function getLastFM() {
-  var url = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
-              lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
-  client.get(url, function(data, s, err) {
-    // console.log(err);
-    io.emit('lastfmNowPlaying', data);
-  });
-}
-
 function setListeners() {
   getLastFM();
   setInterval(getLastFM, 1000);
@@ -146,11 +140,22 @@ function setListeners() {
   setInterval(monzo.getBalance, 300000);
 }
 
+function getLastFM() {
+  var url = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
+              lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
+  client.get(url, function(data) {
+    io.emit('lastfmNowPlaying', data);
+  }).on('error', function (err) {
+    console.log('something went wrong on the request', err.request.options);
+  });
+}
+
 function getWeather() {
   var url = 'http://api.openweathermap.org/data/2.5/weather?q='
             +weatherLocation+'&appid='+weatherApiKey
             +'&units=metric';
   client.get(url, function(data) {
+    console.log(weatherLocation);
     io.emit('weather', data);
   });
 }
