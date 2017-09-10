@@ -6,43 +6,15 @@ var intervals = false;
 //Name used in main greeting
 var userFirstName;
 
-//Last fm used for Spotify
-var lastfmApiKey = 'dac2e4c07554948ac38f77058d557703';
-var lastfmUser;
-
-
-//Open Weather
-var weatherApiKey = 'a358ab331ca3b397d65a029876f08d7b';
-var weatherLocation;
-
-//Dashboard deadlines
-var greyscale;
-//Event Listeners
-//Get User details
-
-//Socket.io functions
-socket.on('sessionVariables', setGlobalVariables);
-socket.on('layout', layoutAddIdToBoxes);
-socket.on('apis', loadAPISelectorSettings);
 
 
 
 
 
-/**
- * Function to get the user details for use with the global variables
- */
-// function getSession() {
-//   var url = '/api/user';
-//   var xhr = new XMLHttpRequest();
-//   xhr.open('GET', url, true);
-//   xhr.onload = function() {
-//     if (xhr.status === 200) {
-//       setGlobalVariables(JSON.parse(xhr.responseText));
-//     }
-//   }
-//   xhr.send();
-// }
+
+
+
+
 
 /**
  * Function to add the user details to global variables
@@ -111,13 +83,9 @@ function createSignUpButton() {
  */
 function loadPageSetIntervals() {
   getNews();
-  getLastFMNowPlaying();
-  getWeather();
-  getRandQuote();
+  // getRandQuote();
   updateDateTime();
   if (!intervals) {
-    setInterval(getLastFMNowPlaying, 1000);
-    setInterval(getWeather, 300000);
     setInterval(getRandQuote, 300000);
     setInterval(getNews, 300000);
     intervals = true;
@@ -133,11 +101,11 @@ function getNews() {
   getFourFourTwoNews();
   getTechCrunchNews();
   getGuardianNews();
-  getGoogleNews();
-  getItalianFootballNews();
-  getFinancialTimesNews();
-  getWashingtonPostNews();
-  getCNNNews();
+  // getGoogleNews();
+  // getItalianFootballNews();
+  // getFinancialTimesNews();
+  // getWashingtonPostNews();
+  // getCNNNews();
 }
 
 /**
@@ -257,130 +225,10 @@ function loadNewsToDashboard(news, divId) {
   }
 }
 
-/**
- * Function to get the current playing track of the specified user
- */
-function getLastFMNowPlaying() {
-  var lastfmGetRecentTracksURL =
-        'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
-        lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', lastfmGetRecentTracksURL, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      loadLastFMToDashboard(JSON.parse(xhr.responseText));
-    } else {
-      console.error('error getting last fm data', xhr);
-    document.getElementById('last-fm-div').innerHTML =
-    'Sorry, there has been an error getting your deadlines';
-    }
-  }
-  xhr.send();
-}
 
-/**
- * Function to load the current playing track to the dashboard
- */
-function loadLastFMToDashboard(music) {
-  var lastfmDiv = document.getElementById('last-fm-div');
-  lastfmDiv.innerHTML = '';
-  var currentTrack = music.recenttracks.track[0];
-  var h = document.createElement('h4');
-  h.textContent = 'LastFM/Spotify';
-  lastfmDiv.appendChild(h);
-  //Check if track is currently Playing
-  //Sometimes doesn't work due to lastFmAPI
-  if (currentTrack['@attr']) {
-    var el = document.createElement('h5');
-    el.textContent = 'Current Track';
-    lastfmDiv.appendChild(el);
 
-    el = document.createElement('p');
-    el.textContent = currentTrack.name;
-    lastfmDiv.appendChild(el);
 
-    el = document.createElement('h5');
-    el.textContent = 'Artist';
-    lastfmDiv.appendChild(el);
 
-    el = document.createElement('p');
-    el.textContent = currentTrack.artist["#text"];
-    lastfmDiv.appendChild(el);
-    } else {
-      var el = document.createElement('h5');
-      el.textContent = 'Nothing Playing';
-      lastfmDiv.appendChild(el);
-    }
-}
-
-/**
- * Function to get the current weather of the users specified city from openweathermap
- */
-function getWeather() {
-  var xhr = new XMLHttpRequest();
-  var url = 'http://api.openweathermap.org/data/2.5/weather?q='
-            +weatherLocation+'&appid='+weatherApiKey
-            +'&units=metric';
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      loadWeatherToDashboard(JSON.parse(xhr.responseText));
-    } else {
-      console.error('error getting last fm data', xhr);
-    document.getElementById('weather-div').innerHTML =
-    'Sorry, there has been an error getting your weather';
-    }
-  }
-  xhr.send();
-}
-
-/**
- * Function to print the weather to the dashboard
- */
-function loadWeatherToDashboard(weather) {
-  var weatherDiv = document.getElementById('weather-div');
-  weatherDiv.innerHTML = '';
-  var currentWeather = weather;
-  var h = document.createElement('h4');
-  h.textContent = 'Current Weather';
-  weatherDiv.appendChild(h);
-
-  h = document.createElement('h5');
-  h.textContent = weather.name+ ' ('+weather.sys.country+')';
-  weatherDiv.appendChild(h);
-
-  var div = document.createElement('div');
-  div.classList.add("weather-container");
-  weatherDiv.appendChild(div);
-
-  h = document.createElement('p');
-  h.textContent = 'Current Sky: ';
-  div.appendChild(h);
-  var el = document.createElement('span');
-  el.classList.add('weather-stats');
-  el.textContent = weather.weather[0].description;
-  h.appendChild(el);
-
-  h = document.createElement('p');
-  h.textContent = 'Current Temperature: ';
-  div.appendChild(h);
-  var el = document.createElement('span');
-  el.classList.add('weather-stats');
-  el.textContent = weather.main.temp+' Celsius';
-  h.appendChild(el);
-
-  var sunrise = new Date(weather.sys.sunrise*1000);
-  var sunset = new Date(weather.sys.sunset*1000);
-
-  el = document.createElement('p');
-  el.textContent = 'Sunrise: '+sunrise.getHours()+':'+sunrise.getMinutes()+' AM';
-  div.appendChild(el);
-
-  el = document.createElement('p');
-  el.textContent = 'Sunset: '+sunset.getHours()+':'+sunset.getMinutes()+' PM';
-  div.appendChild(el);
-
-}
 
 /**
  * Function to get a random quote
@@ -421,17 +269,7 @@ function loadQuoteToDashboard(quote) {
   div.appendChild(el);
 }
 
-function getAvailableApis() {
-  var xhr = new XMLHttpRequest();
-  var url = '/api/loadedApis';
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      loadAPISelectorSettings(JSON.parse(xhr.responseText));
-    }
-  }
-  xhr.send();
-}
+
 
 /**
  * Function to load the available apis to the api selection list inside settings
@@ -503,23 +341,7 @@ function updateBoxApi(e) {
   loadPageSetIntervals();
 }
 
-/**
- * Function to update the layout table with the new layout of the dashboard
- */
-function updateLayoutTable(boxNo, boxId) {
-  var url = '/api/layout/'+boxNo;
-  var http = new XMLHttpRequest();
-  http.open('POST', url, true);
-  http.setRequestHeader('Content-Type','application/json');
-  http.onload = function() {
-    if (http.status == 200) {
-    }
-  };
-  http.send(JSON.stringify(  {
-      boxid: boxId
-    }
-  ));
-}
+
 
 /**
  * Function to add the correct id to the correct box to display api's
@@ -531,6 +353,237 @@ function layoutAddIdToBoxes(layout) {
     boxes[i].id = layout[i].boxId;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Fixed Code
+//Socket.io functions
+socket.on('sessionVariables', setGlobalVariables);
+socket.on('layout', layoutAddIdToBoxes);
+socket.on('apis', loadAPISelectorSettings);
+socket.on('lastfmNowPlaying', showLastfmNowPlaying);
+socket.on('weather', loadWeatherToDashboard);
+socket.on('monzoBalance', showMonzoAccountBalance);
+
+
+
+
+
+
+/**
+ * Function to add a link to the Monzo Authorisation page
+ * Will be overwritten is user is already logged in
+ */
+function showMonzoAuthorise() {
+  var monzoBalanceDiv = document.getElementById('monzo-balance-div');
+  monzoBalanceDiv.innerHTML = '';
+  var h = document.createElement('h4');
+  h.textContent = 'Monzo';
+  monzoBalanceDiv.appendChild(h);
+  var p = document.createElement('p');
+  p.textContent = 'Please authorise your account';
+  monzoBalanceDiv.appendChild(p);
+  p = document.createElement('p');
+  p.textContent = 'to be used with this application';
+  monzoBalanceDiv.appendChild(p);
+  var a = document.createElement('a');
+  a.textContent = 'Authorisation';
+  a.href = '/auth/monzo';
+  monzoBalanceDiv.appendChild(a);
+
+}
+
+/**
+ * Function to load the current Monzo Account balance to the dashboard
+ */
+function showMonzoAccountBalance(json) {
+  // json = JSON.parse(json);
+  console.log(json);
+  var balance = (json.balance/100).toFixed(2);
+  var spendToday = (json.spend_today/100).toFixed(2);
+  spendToday = spendToday.substr(1);
+  var monzoBalanceDiv = document.getElementById('monzo-balance-div');
+  monzoBalanceDiv.innerHTML = '';
+  var h = document.createElement('h4');
+  h.textContent = 'Monzo';
+  monzoBalanceDiv.appendChild(h);
+  h = document.createElement('h5');
+  h.textContent = 'Account Balance';
+  monzoBalanceDiv.appendChild(h);
+  var p = document.createElement('p');
+  p.textContent = '£' + balance;
+  monzoBalanceDiv.appendChild(p);
+  h = document.createElement('h5');
+  h.textContent = 'Amount Spent Today';
+  monzoBalanceDiv.appendChild(h);
+  p = document.createElement('p');
+  p.textContent = '£' + spendToday;
+  monzoBalanceDiv.appendChild(p);
+
+}
+
+
+
+
+/**
+ * Function to load the current playing track to the dashboard
+ */
+function showLastfmNowPlaying(music) {
+  var lastfmDiv = document.getElementById('last-fm-div');
+  lastfmDiv.innerHTML = '';
+  var currentTrack = music.recenttracks.track[0];
+  var h = document.createElement('h4');
+  h.textContent = 'LastFM/Spotify';
+  lastfmDiv.appendChild(h);
+  //Check if track is currently Playing
+  //Sometimes doesn't work due to lastFmAPI
+  if (currentTrack['@attr']) {
+    var el = document.createElement('h5');
+    el.textContent = 'Current Track';
+    lastfmDiv.appendChild(el);
+
+    el = document.createElement('p');
+    el.textContent = currentTrack.name;
+    lastfmDiv.appendChild(el);
+
+    el = document.createElement('h5');
+    el.textContent = 'Artist';
+    lastfmDiv.appendChild(el);
+
+    el = document.createElement('p');
+    el.textContent = currentTrack.artist["#text"];
+    lastfmDiv.appendChild(el);
+    } else {
+      var el = document.createElement('h5');
+      el.textContent = 'Nothing Playing';
+      lastfmDiv.appendChild(el);
+    }
+}
+
+/**
+ * Function to print the weather to the dashboard
+ */
+function loadWeatherToDashboard(weather) {
+  var weatherDiv = document.getElementById('weather-div');
+  weatherDiv.innerHTML = '';
+  var currentWeather = weather;
+  var h = document.createElement('h4');
+  h.textContent = 'Current Weather';
+  weatherDiv.appendChild(h);
+
+  h = document.createElement('h5');
+  h.textContent = weather.name+ ' ('+weather.sys.country+')';
+  weatherDiv.appendChild(h);
+
+  var div = document.createElement('div');
+  div.classList.add("weather-container");
+  weatherDiv.appendChild(div);
+
+  h = document.createElement('p');
+  h.textContent = 'Current Sky: ';
+  div.appendChild(h);
+  var el = document.createElement('span');
+  el.classList.add('weather-stats');
+  el.textContent = weather.weather[0].description;
+  h.appendChild(el);
+
+  h = document.createElement('p');
+  h.textContent = 'Current Temperature: ';
+  div.appendChild(h);
+  var el = document.createElement('span');
+  el.classList.add('weather-stats');
+  el.textContent = weather.main.temp+' Celsius';
+  h.appendChild(el);
+
+  var sunrise = new Date(weather.sys.sunrise*1000);
+  var sunset = new Date(weather.sys.sunset*1000);
+
+  el = document.createElement('p');
+  el.textContent = 'Sunrise: '+sunrise.getHours()+':'+sunrise.getMinutes()+' AM';
+  div.appendChild(el);
+
+  el = document.createElement('p');
+  el.textContent = 'Sunset: '+sunset.getHours()+':'+sunset.getMinutes()+' PM';
+  div.appendChild(el);
+}
+
+/**
+ * Function to update the layout table with the new layout of the dashboard
+ */
+function updateLayoutTable(boxNo, boxId) {
+  var json = JSON.stringify({
+                  boxid: boxId,
+                  boxno: boxNo
+                });
+  socket.emit('updateLayout', json);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

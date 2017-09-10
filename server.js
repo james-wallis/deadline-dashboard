@@ -8,6 +8,10 @@ var mysql = require('mysql');
 var bodyParser = require('body-parser');
 var sqlConfig = require('./sql_config.json');
 var sql = mysql.createConnection(sqlConfig.mysql);
+var Client = require('node-rest-client').Client;
+var client = new Client();
+var request = require('request');
+require('dotenv').config();
 
 //Setup Express and Socket.io
 var app     = express();
@@ -39,6 +43,18 @@ app.use(bodyParser.urlencoded({
  */
 app.use(bodyParser.json());
 
+//Modules
+var deadlines = require('./modules/deadlines.js');
+deadlines.passGlobals(app, io, sql);
+var monzo = require('./modules/monzo.js');
+monzo.passGlobals(app, io, client, request);
+
+
+// Global Variables
+var lastfmApiKey = process.env.LAST_FM_API_KEY;
+var lastfmUser = '';
+var weatherApiKey = process.env.WEATHER_API_KEY;
+var weatherLocation;
 
 
 // logging in order to fully understand what the API is doing
@@ -48,20 +64,22 @@ app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.
 io.on('connection', function(socket){
   console.log('a user connected');
   sendSessionVariables();
-  getLayout();
+  sendLayout();
   sendApis();
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
-
+  socket.on('newUser', addUser);
+  socket.on('updateLayout', updateLayout);
 });
 
+//Do when server starts
+setListeners();
 
 
 
 // server api
-//   GET  /api/user          - get variables used for a session, username, city for weather
-//   POST /api/user          - Add a new user, only called once as the program has one user
 //   GET  /api/deadlines     - list deadlines ordered by time from most recent, returns [like above, like above, ...]
 //         ?order=...        - on the dashboard page ordered by closest date, on the deadline page changes depending on what the user wants
 //   POST /api/deadlines     - upload a new deadline, its title, desc and its due date, returns {id: ..., title: ..., desc: ..., duedate...}
@@ -70,34 +88,13 @@ io.on('connection', function(socket){
 //   GET  /api/units         - Lists units ordered in the way they are entered into the table
 //   POST /api/units         - Adds a unit to the database
 //   DELETE /api/units       - Deletes a unit from the database
-//   GET  /api/loadedApis    - Gets the list of apis that have functions created
-//   GET  /api/layout        - Gets the list of the current layout used to assign the correct id's to the correct divs
-//   POST /api/layout/:boxno - Updates the layout table, uses the boxno to find the correct element in the table
-app.get('/api/user', sendSessionVariables);
-app.post('/api/user', addUser);
-app.get('/api/deadlines', sendDeadlines);
-app.post('/api/deadlines', uploadDeadline);
-app.post('/api/deadlines/:id', updateDeadline);
-app.delete('/api/deadlines', deleteDeadline);
-app.get('/api/units', sendUnits);
-app.post('/api/units', uploadUnit);
-app.delete('/api/units', deleteUnit);
-app.get('/api/loadedApis', sendApis);
-app.get('/api/layout', getLayout);
-app.post('/api/layout/:boxno', updateLayout);
-
-/*
- *
- *
- *    ####  ###### #####  #    # ###### #####     ###### #    # #    #  ####  ##### #  ####  #    #  ####
- *   #      #      #    # #    # #      #    #    #      #    # ##   # #    #   #   # #    # ##   # #
- *    ####  #####  #    # #    # #####  #    #    #####  #    # # #  # #        #   # #    # # #  #  ####
- *        # #      #####  #    # #      #####     #      #    # #  # # #        #   # #    # #  # #      #
- *   #    # #      #   #   #  #  #      #   #     #      #    # #   ## #    #   #   # #    # #   ## #    #
- *    ####  ###### #    #   ##   ###### #    #    #       ####  #    #  ####    #   #  ####  #    #  ####
- *
- *
- */
+app.get('/api/deadlines', deadlines.sendDeadlines);
+app.post('/api/deadlines', deadlines.uploadDeadline);
+app.post('/api/deadlines/:id', deadlines.updateDeadline);
+app.delete('/api/deadlines', deadlines.deleteDeadline);
+app.get('/api/units', deadlines.sendUnits);
+app.post('/api/units', deadlines.uploadUnit);
+app.delete('/api/units', deadlines.deleteUnit);
 
 /**
  * function to load the session variables from the database
@@ -115,6 +112,8 @@ function sendSessionVariables() {
    // deal with many users (at this stage)
    if (data[0]) {
      var r = data[0];
+     lastfmUser = r.userLastFMName;
+     weatherLocation = r.userCity;
      session = {
        firstname: r.userFirstName,
        lastname: r.userLastName,
@@ -128,195 +127,45 @@ function sendSessionVariables() {
  });
 }
 
-/**
- * Function to add a new user to the database
- * Creates a new db record for user and then querys the database
- */
-function addUser(req, res) {
-  var dbRecord = {
-    userFirstName: req.body.firstname,
-    userLastName: req.body.lastname,
-    userLastFMName: req.body.lastfm,
-    userCity: req.body.city,
-    user24hrTime: req.body.time,
-    userDeadlineGrayScale: req.body.greyscale
-  };
-  sql.query(sql.format('INSERT INTO user SET ? ', dbRecord), function (err, result) {
-    if (err) console.log("Error inserting");
-    if (req.accepts('html')) {
-      // browser should go to the listing of units
-      res.redirect(303, '#');
-    } else {
-      res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
-      // XML HTTP request that accepts JSON will instead get that
-      res.json({userId: result.insertedId, userFirstName: dbRecord.userFirstName,
-        userLastName: dbRecord.userLastName, userLastFMName: dbRecord.userLastFMName,
-        userCity: dbRecord.userCity, user24hrTime: dbRecord.user24hrTime,
-        userDeadlineGrayScale: dbRecord.userDeadlineGrayScale});
-    }
+
+function getLastFM() {
+  var url = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
+              lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
+  client.get(url, function(data, s, err) {
+    // console.log(err);
+    io.emit('lastfmNowPlaying', data);
+  });
+}
+
+function setListeners() {
+  getLastFM();
+  setInterval(getLastFM, 1000);
+  getWeather();
+  setInterval(getWeather, 300000);
+  monzo.getBalance();
+  setInterval(monzo.getBalance, 300000);
+}
+
+function getWeather() {
+  var url = 'http://api.openweathermap.org/data/2.5/weather?q='
+            +weatherLocation+'&appid='+weatherApiKey
+            +'&units=metric';
+  client.get(url, function(data) {
+    io.emit('weather', data);
   });
 }
 
 /**
- * Function to send the list of deadlines
- * @return the list of deadlines created when the database was queried
+ * Function to update the layout table
+ * Called when one api is changed in the settings menu
  */
-function sendDeadlines(req, res) {
- var deadlines = [];
- // prepare query
- var query = 'SELECT id, title, description, dueDate FROM deadlines';
- //Where ensures that we do not see past deadlines
- query += ' WHERE dueDate >= CURRENT_DATE()';
- if (req.query.id) {
-   query += ' AND id = '+sql.escape(req.query.id)
- }
- var sort;
- switch (req.query.order) {
-   case 'near': sort = 'dueDate ASC'; break; // by nearest date
-   case 'far': sort = 'dueDate DESC'; break; // by furthest away date
-   case 'a2z': sort = 'title ASC'; break; // by unit title a to z
-   case 'z2a': sort = 'title DESC'; break; // by unit title z to a
-   default:    sort = 'dueDate ASC'; // Default with nearest date
- }
- query += ' ORDER BY ' + sort;
- //Add limit to query
- if (req.query.limit) {
-   query += ' LIMIT '+ escape(req.query.limit);
- }
- // now query the table and output the results
- sql.query(query, function (err, data) {
-   if (err) return error(res, 'failed to run the query', err);
-   data.forEach(function (row) {
-     deadlines.push({
-       id: row.id,
-       title: row.title,
-       description: row.description,
-       dueDate: row.dueDate
-     });
-   });
-   res.json(deadlines);
- });
-}
-
-/**
- * Function to update a deadline
- * Uses the req.params.id to get the deadline id to update
- */
-function updateDeadline(req, res) {
-  var title = req.body.title,
-      desc = req.body.description,
-      date = req.body.date,
-      id = req.params.id;
-  sql.query('UPDATE deadlines SET title= ? , description= ? , dueDate= ? WHERE id = ?', [title, desc, date, id], function(err) {
+function updateLayout(json) {
+  json = JSON.parse(json);
+  console.log(json);
+  var boxId = json.boxid,
+      boxNo = json.boxno;
+  sql.query('UPDATE layout SET boxId= ? WHERE boxNo = ?', [boxId, boxNo], function(err) {
     if (err) console.log("Error inserting");
-    if (req.accepts('html')) {
-      // browser should go to the listing of deadlines
-      res.redirect(303, '/#' + id);
-    } else {
-      res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
-      // XML HTTP request that accepts JSON will instead get that
-      res.json({id: id, title: title, description: desc, dueDate: date});
-    }
-  });
-}
-
-/**
- * Function to upload a deadline into the database
- * Creates the dbRecord and queries the database
- */
-function uploadDeadline(req, res) {
- //Add deadline to the database
- var dbRecord = {
-   title: req.body.title,
-   description: req.body.description,
-   dueDate: req.body.date
- };
- sql.query(sql.format('INSERT INTO deadlines SET ?', dbRecord), function (err, result) {
-   if (err) console.log("Error inserting");
-   if (req.accepts('html')) {
-     // browser should go to the listing of deadlines
-     res.redirect(303, '/#' + result.insertId);
-   } else {
-     res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
-     // XML HTTP request that accepts JSON will instead get that
-     res.json({id: result.insertedId, title: dbRecord.title, description: dbRecord.description, dueDate: dbRecord.dueDate});
-   }
- });
-}
-
-/**
- * Function to send the units list in order to be able to print the units
- * @return the list of units
- */
-function sendUnits(req, res) {
- var units = [];
- // prepare query
- var query = 'SELECT id, unitShortCode, unitLongName, unitColour FROM units';
- // now query the table and output the results
- sql.query(query, function (err, data) {
-   if (err) return error(res, 'failed to run the query', err);
-   data.forEach(function (row) {
-     units.push({
-       id: row.id,
-       shortCode: row.unitShortCode,
-       longCode: row.unitLongName,
-       colour: row.unitColour
-     });
-   });
-   res.json(units);
- });
-}
-
-/**
- * Function to add a unit to the database
- * Creates a dbRecord and then queries the database
- */
-function uploadUnit(req, res) {
- //Add unit to the database
- var dbRecord = {
-   unitShortCode: req.body.unitShortCode,
-   unitLongName: req.body.unitLongName,
-   unitColour: req.body.unitColour
- };
- sql.query(sql.format('INSERT INTO units SET ?', dbRecord), function (err, result) {
-   if (err) console.log("Error inserting");
-   if (req.accepts('html')) {
-     // browser should go to the listing of units
-     res.redirect(303, '/#' + result.insertId);
-   } else {
-     res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
-     // XML HTTP request that accepts JSON will instead get that
-     res.json({id: result.insertedId, unitShortCode: dbRecord.unitShortCode, unitLongName: dbRecord.unitLongName, unitColour: dbRecord.unitColour});
-   }
- });
-}
-
-/**
- * Function to delete a deadline
- * if req.query.title is not false it will delete all the deadlines that have the same title (unit)
- * this is used in unit delete so that a deadline cannot exist if its unit does not
- */
-function deleteDeadline(req, res) {
-  if ([req.query.title] != 'false') {
-    sql.query(sql.format('DELETE FROM deadlines WHERE title=?', [req.query.title]), function (err, result) {
-      if (err) return error(res, 'failed sql delete', err);
-      res.sendStatus(200);
-    });
-  } else {
-    sql.query(sql.format('DELETE FROM deadlines WHERE id=?', [req.query.id]), function (err, result) {
-      if (err) return error(res, 'failed sql delete', err);
-      res.sendStatus(200);
-    });
-  }
-}
-
-/**
- * Function to delete a unit from the database
- */
-function deleteUnit(req, res) {
-  sql.query(sql.format('DELETE FROM units WHERE id=?', [req.query.id]), function (err, result) {
-    if (err) return error(res, 'failed sql delete', err);
-    res.sendStatus(200);
   });
 }
 
@@ -347,7 +196,7 @@ function sendApis() {
  * Function to get the saved layout of the dashboard
  * Used to add each id to the dashboard
  */
-function getLayout() {
+function sendLayout() {
   var layout = [];
   // prepare query
   var query = 'SELECT boxNo, boxId FROM layout';
@@ -364,22 +213,30 @@ function getLayout() {
   });
 }
 
+
 /**
- * Function to update the layout table
- * Called when one api is changed in the settings menu
+ * Function to add a new user to the database
+ * Creates a new db record for user and then querys the database
  */
-function updateLayout(req, res) {
-  var boxId = req.body.boxid,
-      boxNo = req.params.boxno;
-  sql.query('UPDATE layout SET boxId= ? WHERE boxNo = ?', [boxId, boxNo], function(err) {
-    if (err) console.log("Error inserting");
-    if (req.accepts('html')) {
-      // browser should go to the listing of deadlines
-      res.redirect(303, '/#' + boxNo);
+function addUser(json) {
+  json = JSON.parse(json);
+  var dbRecord = {
+    userFirstName: json.firstname,
+    userLastName: json.lastname,
+    userLastFMName: json.lastfm,
+    userCity: json.city,
+    user24hrTime: json.time,
+    userDeadlineGrayScale: json.greyscale
+  };
+  console.log(dbRecord);
+  sql.query(sql.format('INSERT INTO user SET ? ', dbRecord), function (err, result) {
+    var returnMessage;
+    if (err) {
+      console.log("Error inserting user into database");
+      returnMessage = false;
     } else {
-      res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
-      // XML HTTP request that accepts JSON will instead get that
-      res.json({boxNo: boxNo, boxId: boxId});
+      console.log("User inserted into database");
+      returnMessage = true;
     }
   });
 }

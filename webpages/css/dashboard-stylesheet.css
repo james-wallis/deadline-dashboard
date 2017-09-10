@@ -213,6 +213,21 @@ main h4 {
   margin: 3% 2%;
   color: #868784;
 }
+#monzo-balance-div {
+  padding: 2% 0;
+}
+#monzo-balance-div h5 {
+  text-align: center;
+  color: #D2D4C8;
+  text-transform: uppercase;
+  padding: 5% 0 0 0;
+}
+#monzo-balance-div p {
+  color: #868784;
+  font-size: 16px;
+  text-align: center;
+  padding: 2% 0;
+}
 /* Individual api styling end */
 
 /* SETTINGS MENU STYLES */

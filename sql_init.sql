@@ -61,6 +61,7 @@ insert ignore into dashboard.apis values (10, 'Italian Football', 'football-ital
 insert ignore into dashboard.apis values (11, 'Financial Times', 'financial-time-div', 1);
 insert ignore into dashboard.apis values (12, 'The Washington Post', 'washington-post-div', 1);
 insert ignore into dashboard.apis values (13, 'CNN', 'cnn-div', 1);
+insert ignore into dashboard.apis values (14, 'Monzo Balance', 'monzo-balance-div', 0);
 
 insert ignore into dashboard.layout values (1, '');
 insert ignore into dashboard.layout values (2, '');

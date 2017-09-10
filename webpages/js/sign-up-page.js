@@ -30,25 +30,16 @@ function addUser(e) {
           time = document.getElementById('time').checked,
           greyscale = document.getElementById('greyscale').checked;
           console.log(firstname);
-      var url = '/api/user';
-      var http = new XMLHttpRequest();
-      console.log(url);
-      http.open('POST', url, true);
-      http.setRequestHeader('Content-Type','application/json');
-      http.onload = function() {
-        if (http.status == 200) {
-          introduction(firstname);
-        }
-      };
-      http.send(JSON.stringify({
+      var json = JSON.stringify({
           firstname: firstname,
           lastname: lastname,
           lastfm: lastfmname,
           city: city,
           time: time,
           greyscale: greyscale
-        }
-    ));
+        });
+      socket.emit('newUser', json);
+      introduction(firstname);
     } else {
       swal("Cancelled", "Your details have not been added", "error");
     }
@@ -69,7 +60,7 @@ function introduction(firstname) {
   var div = document.createElement('div');
   div.classList.add('introduction');
   container.appendChild(div);
-  
+
   var el = document.createElement('p');
   el.textContent = 'Just a few things to start off. The dashboard can  \
                     be used to view the news, your current lastfm/spotify \
@@ -93,7 +84,7 @@ function introduction(firstname) {
   div.appendChild(el);
 
   el = document.createElement('img');
-  el.setAttribute('src', '/img/menu.gif');
+  el.setAttribute('src', 'img/menu.gif');
   el.setAttribute('alt', 'Gif showing the menu');
   div.appendChild(el);
 

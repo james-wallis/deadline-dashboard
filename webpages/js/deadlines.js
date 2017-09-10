@@ -11,7 +11,7 @@ var currentPage = 1;
 window.addEventListener('load', loadDeadlines);
 //Event Listeners for the main dashboard page only
 if(deadlinePage) {
-  document.getElementById('sort-deadlines').addEventListener("change", loadDeadlines);
+  // document.getElementById('sort-deadlines').addEventListener("change", loadDeadlines);
 } else {
   document.getElementById('addDeadlineForm').addEventListener("submit", confirmSubmitForm);
   document.getElementById('addUnitForm').addEventListener("submit", confirmSubmitForm);
