@@ -2,7 +2,8 @@
  * An API which serves as a configurable dashboard.
  */
  process.on('uncaughtException', function (err) {
-     console.log(err);
+  console.log('uncaughtException');
+  console.log(err);
  });
 'use static'
 var express = require('express');
@@ -50,13 +51,27 @@ var deadlines = require('./modules/deadlines.js');
 deadlines.passGlobals(app, io, sql);
 var monzo = require('./modules/monzo.js');
 monzo.passGlobals(app, io, client, request);
+var lastfm = require('./modules/lastfm.js');
+lastfm.passGlobals(app, io, client);
+var weather = require('./modules/weather.js');
+weather.passGlobals(app, io, client);
+var news = require('./modules/news.js');
+news.passGlobals(app, io, client);
 
 
 // Global Variables
-var lastfmApiKey = process.env.LAST_FM_API_KEY;
-var lastfmUser = '';
-var weatherApiKey = process.env.WEATHER_API_KEY;
-var weatherLocation;
+var session = {
+  firstname: '',
+  lastname: '',
+  lastfmname: '',
+  city: '',
+  timeformat: '',
+  greyscale : ''
+};
+var layout = [];
+var apiList = [];
+var activeApis = [];
+
 
 
 // logging in order to fully understand what the API is doing
@@ -68,19 +83,23 @@ io.on('connection', function(socket){
   sendSessionVariables();
   sendLayout();
   sendApis();
-  setListeners();
+  lastfm.send();
+  weather.send();
+  monzo.balance();
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
   socket.on('newUser', addUser);
   socket.on('updateLayout', updateLayout);
+  socket.on('updateApiList', updateApiList);
 });
 
 //Do when server starts
 // For now do this on client connection as I need to set up a way to get
 //          session variables and send them in different functions
-// setListeners();
-
+getSessionVariables();
+getApis();
+startScrape();
 
 
 // server api
@@ -105,19 +124,18 @@ app.delete('/api/units', deadlines.deleteUnit);
  * @return the session variables such as first name, last name, lastFmname,
  *         city for weather, time format, and greyscale for the deadlines
  */
-function sendSessionVariables() {
+function getSessionVariables() {
   //Get user details from user table
   var query = 'SELECT userFirstName, userLastName, userLastFMName, \
                userCity, user24hrTime, userDeadlineGrayScale FROM user';
  sql.query(query, function (err, data) {
    if (err) return error(res, 'failed to run the query', err);
-   var session = {};
    //Only take the first line of the data as the dashboard does not
    // deal with many users (at this stage)
    if (data[0]) {
      var r = data[0];
-     lastfmUser = r.userLastFMName;
-     weatherLocation = r.userCity;
+     lastfm.setUser(r.userLastFMName);
+     weather.setLocation(r.userCity);
      session = {
        firstname: r.userFirstName,
        lastname: r.userLastName,
@@ -127,95 +145,101 @@ function sendSessionVariables() {
        greyscale : r.userDeadlineGrayScale
      };
    }
-   io.emit('sessionVariables', session);
+   sendSessionVariables();
  });
 }
 
-function setListeners() {
-  getLastFM();
-  setInterval(getLastFM, 1000);
-  getWeather();
-  setInterval(getWeather, 300000);
-  monzo.getBalance();
-  setInterval(monzo.getBalance, 300000);
+function sendSessionVariables() {
+  if (session.firstname !== '') {
+     io.emit('sessionVariables', session);
+  } else {
+    io.emit('login');
+  }
 }
 
-function getLastFM() {
-  var url = 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user='+
-              lastfmUser+'&api_key='+lastfmApiKey+'&limit=1&format=json';
-  client.get(url, function(data) {
-    io.emit('lastfmNowPlaying', data);
-  }).on('error', function (err) {
-    console.log('something went wrong on the request', err.request.options);
-  });
+function startScrape() {
+  // lastfm.scrape(1);
+  weather.scrape(5);
+  monzo.scrape(30);
 }
 
-function getWeather() {
-  var url = 'http://api.openweathermap.org/data/2.5/weather?q='
-            +weatherLocation+'&appid='+weatherApiKey
-            +'&units=metric';
-  client.get(url, function(data) {
-    console.log(weatherLocation);
-    io.emit('weather', data);
-  });
-}
 
 /**
  * Function to update the layout table
  * Called when one api is changed in the settings menu
  */
 function updateLayout(json) {
-  json = JSON.parse(json);
-  console.log(json);
-  var boxId = json.boxid,
-      boxNo = json.boxno;
-  sql.query('UPDATE layout SET boxId= ? WHERE boxNo = ?', [boxId, boxNo], function(err) {
-    if (err) console.log("Error inserting");
+  if (json.oldApi !== '') {
+    sql.query('UPDATE apis SET activeApi = 0, boxNo = -1 WHERE apiId = ?', [json.oldApi.htmlid], function(err) {
+      if (err) console.log("Error inserting");
+    });
+    console.log(json.oldApi);
+    stopApi(json.oldApi);
+  }
+  sql.query('UPDATE apis SET activeApi = 1, boxNo = ? WHERE apiId = ?', [json.newApi.boxNo, json.newApi.htmlid], function(err) {
+    if (err) console.log("Error inserting" + err);
   });
+
+  activateApi(json.newApi);
 }
+
+function updateApiList(list) {
+  apiList = list;
+  sendApis();
+}
+
+// updateApiLayout(json) {
+//
+// }
 
 /**
  * Function to send the list of apis
  * @return the list of apis
  */
-function sendApis() {
-  var apiList = [];
+function getApis() {
+  var tempApiList = [];
   // prepare query
-  var query = 'SELECT id, apiName, apiId, fromNewsApi FROM apis';
+  var query = 'SELECT id, apiName, apiId, fromNewsApi, activeApi, boxNo FROM apis';
   // now query the table and output the results
   sql.query(query, function (err, data) {
     if (err) return error(res, 'failed to run the query', err);
     data.forEach(function (row) {
-      apiList.push({
+      tempApiList.push({
         id: row.id,
         name: row.apiName,
         htmlid: row.apiId,
-        isNews: row.fromNewsApi
+        isNews: row.fromNewsApi,
+        activeApi: row.activeApi,
+        boxNo: row.boxNo
       });
     });
-    io.emit('apis', apiList);
+    apiList = tempApiList;
+    figureActive();
   });
+}
+
+function sendApis() {
+  io.emit('apis', apiList);
 }
 
 /**
  * Function to get the saved layout of the dashboard
  * Used to add each id to the dashboard
  */
+function figureActive() {
+  var list = apiList;
+  var active = [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].activeApi === 1) {
+      active.push(list[i]);
+    }
+  }
+  activeApis = active;
+  activateAll(active);
+}
+
 function sendLayout() {
-  var layout = [];
-  // prepare query
-  var query = 'SELECT boxNo, boxId FROM layout';
-  // now query the table and output the results
-  sql.query(query, function (err, data) {
-    if (err) return error(res, 'failed to run the query', err);
-    data.forEach(function (row) {
-      layout.push({
-        boxNo: row.boxNo,
-        boxId: row.boxId
-      });
-    });
-    io.emit('layout', layout);
-  });
+  io.emit('layout', activeApis);
 }
 
 
@@ -242,6 +266,33 @@ function addUser(json) {
     } else {
       console.log("User inserted into database");
       returnMessage = true;
+      getSessionVariables();
     }
   });
+}
+
+
+function activateAll(list) {
+  console.log(list);
+  for (var i = 0; i < list.length; i++) {
+    activateApi(list[i]);
+  }
+}
+
+function stopApi(api) {
+  var apiID = api.htmlid;
+  if (apiID.includes('last-fm')) {
+    lastfm.stop();
+  } else if (apiID.includes('weather')) {
+    weather.stop();
+  }
+}
+
+function activateApi(api) {
+  var apiID = api.htmlid;
+  if (apiID.includes('last-fm')) {
+    lastfm.scrape(1);
+  } else if (apiID.includes('weather')) {
+    weather.scrape(5);
+  }
 }

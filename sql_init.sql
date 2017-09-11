@@ -28,7 +28,9 @@ create table if not exists dashboard.apis (
   id int primary key auto_increment,
   apiName varchar(50),
   apiId varchar(50),
-  fromNewsApi boolean default 0
+  fromNewsApi boolean default 0,
+  activeApi boolean default 0,
+  boxNo int default -1
 ) charset 'utf8mb4';
 
 create table if not exists dashboard.layout (
@@ -48,20 +50,20 @@ insert ignore into dashboard.units values (4, 'mathfun', 'Discrete Mathematics a
 insert ignore into dashboard.units values (5, 'dsalg', 'Data Structures and Algorithms', '#F06543');
 insert ignore into dashboard.units values (6, 'adproc', 'Advanced Programming', '#ABE188');
 
-insert ignore into dashboard.apis values (1, 'Four Four Two', 'fourfourtwo-news-div', 1);
-insert ignore into dashboard.apis values (2, 'Current Weather', 'weather-div', 0);
-insert ignore into dashboard.apis values (3, 'The Guardian UK', 'guardian-news-div', 1);
-insert ignore into dashboard.apis values (4, 'Random Quote', 'quote-div', 0);
-insert ignore into dashboard.apis values (5, 'LastFM', 'last-fm-div', 0);
-insert ignore into dashboard.apis values (6, 'BBC News', 'bbc-news-div', 1);
-insert ignore into dashboard.apis values (7, 'Techcrunch', 'tech-crunch-div', 1);
-insert ignore into dashboard.apis values (8, 'BBC Sport', 'bbc-sport-div', 1);
-insert ignore into dashboard.apis values (9, 'Google News', 'google-news-div', 1);
-insert ignore into dashboard.apis values (10, 'Italian Football', 'football-italia-div', 1);
-insert ignore into dashboard.apis values (11, 'Financial Times', 'financial-time-div', 1);
-insert ignore into dashboard.apis values (12, 'The Washington Post', 'washington-post-div', 1);
-insert ignore into dashboard.apis values (13, 'CNN', 'cnn-div', 1);
-insert ignore into dashboard.apis values (14, 'Monzo Balance', 'monzo-balance-div', 0);
+insert ignore into dashboard.apis values (1, 'Four Four Two', 'fourfourtwo-news-div', 1, 0, -1);
+insert ignore into dashboard.apis values (2, 'Current Weather', 'weather-div', 0, 0, -1);
+insert ignore into dashboard.apis values (3, 'The Guardian UK', 'guardian-news-div', 1, 0, -1);
+insert ignore into dashboard.apis values (4, 'Random Quote', 'quote-div', 0, 0, -1);
+insert ignore into dashboard.apis values (5, 'LastFM', 'last-fm-div', 0, 0, -1);
+insert ignore into dashboard.apis values (6, 'BBC News', 'bbc-news-div', 1, 0, -1);
+insert ignore into dashboard.apis values (7, 'Techcrunch', 'tech-crunch-div', 1, 0, -1);
+insert ignore into dashboard.apis values (8, 'BBC Sport', 'bbc-sport-div', 1, 0, -1);
+insert ignore into dashboard.apis values (9, 'Google News', 'google-news-div', 1, 0, -1);
+insert ignore into dashboard.apis values (10, 'Italian Football', 'football-italia-div', 1, 0, -1);
+insert ignore into dashboard.apis values (11, 'Financial Times', 'financial-time-div', 1, 0, -1);
+insert ignore into dashboard.apis values (12, 'The Washington Post', 'washington-post-div', 1, 0, -1);
+insert ignore into dashboard.apis values (13, 'CNN', 'cnn-div', 1, 0, -1);
+insert ignore into dashboard.apis values (14, 'Monzo Balance', 'monzo-balance-div', 0, 0, -1);
 
 insert ignore into dashboard.layout values (1, '');
 insert ignore into dashboard.layout values (2, '');

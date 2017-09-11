@@ -17,6 +17,21 @@ var monzoRefreshToken = '';
 
 
 //Functions
+function passGlobals(newApp, newIO, newClient, newRequest) {
+  app = newApp;
+  io = newIO;
+  client = newClient;
+  request = newRequest;
+  // Set up Redirects
+  redirectsForSignIn();
+}
+
+function scrape(seconds) {
+  seconds = seconds * 1000;
+  getMonzoBalance();
+  setInterval(getMonzoBalance, seconds);
+}
+
 function redirectsForSignIn() {
   app.get('/auth/monzo', function(req, res) {
     var url = "https://auth.getmondo.co.uk/?client_id=" + monzoClientID + "&redirect_uri=" +
@@ -69,15 +84,6 @@ function getMonzoAccount() {
   });
 }
 
-function passGlobals(newApp, newIO, newClient, newRequest) {
-  app = newApp;
-  io = newIO;
-  client = newClient;
-  request = newRequest;
-  // Set up Redirects
-  redirectsForSignIn();
-}
-
 function getMonzoBalance() {
   if (!monzoAccountId || !monzoAccessToken) {
     io.emit('showMonzoLogin');
@@ -100,6 +106,7 @@ function getMonzoBalance() {
 
 //Export functions
 module.exports = {
+  scrape: scrape,
   passGlobals: passGlobals,
-  getBalance: getMonzoBalance
+  balance: getMonzoBalance
 };

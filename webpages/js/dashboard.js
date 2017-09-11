@@ -2,7 +2,7 @@
 var newsapiKey = 'f8b6dcb74300468589b50a53dca36a4c';
 var numStoriesToShow = 3;
 var intervals = false;
-
+var apiList;
 //Name used in main greeting
 var userFirstName;
 
@@ -14,7 +14,7 @@ var userFirstName;
 
 
 
-
+socket.on('login', createSignUpButton);
 
 /**
  * Function to add the user details to global variables
@@ -23,7 +23,6 @@ var userFirstName;
 function setGlobalVariables(session) {
   console.log(session);
   if(isEmptyObject(session)) {
-    document.getElementById('container').innerHTML = '';
     createSignUpButton();
   } else {
     userFirstName = session.firstname;
@@ -51,6 +50,7 @@ function isEmptyObject(obj) {
  * is no users in the user table
  */
 function createSignUpButton() {
+  document.getElementById('container').innerHTML = '';
   document.getElementById('settings-icon').style.display = "none";
   var container = document.getElementById('container');
   container.classList.add('sign-up-button-div');
@@ -275,7 +275,8 @@ function loadQuoteToDashboard(quote) {
  * Function to load the available apis to the api selection list inside settings
  * @param apiList, the list of available api's
  */
-function loadAPISelectorSettings(apiList) {
+function loadAPISelectorSettings(list) {
+  apiList = list;
   console.log(apiList);
   var contentSelector = document.getElementById('contentSelector');
   var boxes = document.getElementsByClassName('dashboard-inner-box');
@@ -346,11 +347,15 @@ function updateBoxApi(e) {
 /**
  * Function to add the correct id to the correct box to display api's
  */
-function layoutAddIdToBoxes(layout) {
-  console.log(layout);
+function layoutAddIdToBoxes(list) {
+  console.log(list);
   var boxes = document.getElementsByClassName('dashboard-inner-box');
-  for (var i = 0; i < layout.length; i++) {
-    boxes[i].id = layout[i].boxId;
+  for (var i = 0; i < list.length; i++) {
+    for (var j = 0; j < list.length; j++) {
+      if (list[j].boxNo === (i+1)) {
+        boxes[i].id = list[j].htmlid;
+      }
+    }
   }
 }
 
@@ -456,22 +461,21 @@ function showMonzoAccountBalance(json) {
 /**
  * Function to load the current playing track to the dashboard
  */
-function showLastfmNowPlaying(music) {
+function showLastfmNowPlaying(track) {
   var lastfmDiv = document.getElementById('last-fm-div');
   lastfmDiv.innerHTML = '';
-  var currentTrack = music.recenttracks.track[0];
   var h = document.createElement('h4');
   h.textContent = 'LastFM/Spotify';
   lastfmDiv.appendChild(h);
   //Check if track is currently Playing
   //Sometimes doesn't work due to lastFmAPI
-  if (currentTrack['@attr']) {
+  if (track.now_playing) {
     var el = document.createElement('h5');
     el.textContent = 'Current Track';
     lastfmDiv.appendChild(el);
 
     el = document.createElement('p');
-    el.textContent = currentTrack.name;
+    el.textContent = track.name;
     lastfmDiv.appendChild(el);
 
     el = document.createElement('h5');
@@ -479,7 +483,7 @@ function showLastfmNowPlaying(music) {
     lastfmDiv.appendChild(el);
 
     el = document.createElement('p');
-    el.textContent = currentTrack.artist["#text"];
+    el.textContent = track.artist;
     lastfmDiv.appendChild(el);
     } else {
       var el = document.createElement('h5');
@@ -500,7 +504,7 @@ function loadWeatherToDashboard(weather) {
   weatherDiv.appendChild(h);
 
   h = document.createElement('h5');
-  h.textContent = weather.name+ ' ('+weather.sys.country+')';
+  h.textContent = weather.city+ ' ('+weather.country+')';
   weatherDiv.appendChild(h);
 
   var div = document.createElement('div');
@@ -512,7 +516,7 @@ function loadWeatherToDashboard(weather) {
   div.appendChild(h);
   var el = document.createElement('span');
   el.classList.add('weather-stats');
-  el.textContent = weather.weather[0].description;
+  el.textContent = weather.long_description;
   h.appendChild(el);
 
   h = document.createElement('p');
@@ -520,30 +524,53 @@ function loadWeatherToDashboard(weather) {
   div.appendChild(h);
   var el = document.createElement('span');
   el.classList.add('weather-stats');
-  el.textContent = weather.main.temp+' Celsius';
+  // innerHTML not textContent so that it interprets symbol
+  el.innerHTML = weather.celsius+'&#176;c';
   h.appendChild(el);
-
-  var sunrise = new Date(weather.sys.sunrise*1000);
-  var sunset = new Date(weather.sys.sunset*1000);
-
-  el = document.createElement('p');
-  el.textContent = 'Sunrise: '+sunrise.getHours()+':'+sunrise.getMinutes()+' AM';
-  div.appendChild(el);
-
-  el = document.createElement('p');
-  el.textContent = 'Sunset: '+sunset.getHours()+':'+sunset.getMinutes()+' PM';
-  div.appendChild(el);
+  //
+  // var sunrise = new Date(weather.sunrise*1000);
+  // var sunset = new Date(weather.sunset*1000);
+  //
+  // el = document.createElement('p');
+  // el.textContent = 'Sunrise: '+sunrise.getHours()+':'+sunrise.getMinutes()+' AM';
+  // div.appendChild(el);
+  //
+  // el = document.createElement('p');
+  // el.textContent = 'Sunset: '+sunset.getHours()+':'+sunset.getMinutes()+' PM';
+  // div.appendChild(el);
 }
 
 /**
  * Function to update the layout table with the new layout of the dashboard
  */
 function updateLayoutTable(boxNo, boxId) {
-  var json = JSON.stringify({
-                  boxid: boxId,
-                  boxno: boxNo
-                });
+  var json = {
+    oldApi: '',
+    newApi: '',
+    newApiBoxNo: ''
+  };
+  console.log(apiList);
+  // Set current box to unactive
+  for (var i = 0; i < apiList.length; i++) {
+    if (apiList[i].boxNo == boxNo) {
+      apiList[i].activeApi = 0;
+      apiList[i].boxNo = -1;
+      json.oldApi = apiList[i];
+    }
+  }
+  // Set new box to active
+  for (var i = 0; i < apiList.length; i++) {
+    if (apiList[i].htmlid == boxId) {
+      apiList[i].activeApi = 1;
+      apiList[i].boxNo = boxNo;
+      json.newApi = apiList[i];
+    }
+  }
+  console.log(apiList);
+  console.log(json);
+  // json = JSON.stringify(json);
   socket.emit('updateLayout', json);
+  socket.emit('updateApiList', apiList);
 }
 
 
