@@ -49,6 +49,8 @@ app.use(bodyParser.json());
 //Modules
 var deadlines = require('./modules/deadlines.js');
 deadlines.passGlobals(app, io, sql);
+var timeAndDate = require('./modules/timeAndDate.js');
+timeAndDate.passGlobals(app, io);
 var monzo = require('./modules/monzo.js');
 monzo.passGlobals(app, io, client, request);
 var lastfm = require('./modules/lastfm.js');
@@ -56,7 +58,9 @@ lastfm.passGlobals(app, io, client);
 var weather = require('./modules/weather.js');
 weather.passGlobals(app, io, client);
 var news = require('./modules/news.js');
-news.passGlobals(app, io, client);
+news.passGlobals(app, io, client, sql);
+var googlemaps = require('./modules/googlemaps.js');
+googlemaps.passGlobals(app, io, client);
 
 
 // Global Variables
@@ -80,12 +84,13 @@ app.use('/', function(req, res, next) { console.log(new Date(), req.method, req.
 // Socket.io
 io.on('connection', function(socket){
   console.log('a user connected');
-  sendSessionVariables();
-  sendLayout();
-  sendApis();
+  setUpPage();
+  timeAndDate.send();
   lastfm.send();
   weather.send();
   monzo.balance();
+  news.send();
+  googlemaps.sendWork();
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
@@ -118,6 +123,19 @@ app.delete('/api/deadlines', deadlines.deleteDeadline);
 app.get('/api/units', deadlines.sendUnits);
 app.post('/api/units', deadlines.uploadUnit);
 app.delete('/api/units', deadlines.deleteUnit);
+
+function setUpPage() {
+  if (session.firstname !== '') {
+    var payload = {
+      session: session,
+      apiList: apiList,
+      activeApis: activeApis
+    }
+    io.emit('setupPage', payload);
+  } else {
+    io.emit('login');
+  }
+}
 
 /**
  * function to load the session variables from the database
@@ -159,8 +177,10 @@ function sendSessionVariables() {
 
 function startScrape() {
   // lastfm.scrape(1);
-  weather.scrape(5);
+  timeAndDate.scrape();
+  // weather.scrape(5);
   monzo.scrape(30);
+  news.scrape(120);
 }
 
 
@@ -173,13 +193,11 @@ function updateLayout(json) {
     sql.query('UPDATE apis SET activeApi = 0, boxNo = -1 WHERE apiId = ?', [json.oldApi.htmlid], function(err) {
       if (err) console.log("Error inserting");
     });
-    console.log(json.oldApi);
     stopApi(json.oldApi);
   }
   sql.query('UPDATE apis SET activeApi = 1, boxNo = ? WHERE apiId = ?', [json.newApi.boxNo, json.newApi.htmlid], function(err) {
     if (err) console.log("Error inserting" + err);
   });
-
   activateApi(json.newApi);
 }
 
@@ -271,14 +289,14 @@ function addUser(json) {
   });
 }
 
-
+// Activate all apis that are active
 function activateAll(list) {
-  console.log(list);
   for (var i = 0; i < list.length; i++) {
     activateApi(list[i]);
   }
 }
 
+// Stop scraping for data from an api if it is no longer in use
 function stopApi(api) {
   var apiID = api.htmlid;
   if (apiID.includes('last-fm')) {
@@ -288,11 +306,14 @@ function stopApi(api) {
   }
 }
 
+// Function to activate an api if it is active in the apiList
 function activateApi(api) {
+  console.log(api);
   var apiID = api.htmlid;
   if (apiID.includes('last-fm')) {
     lastfm.scrape(1);
-  } else if (apiID.includes('weather')) {
-    weather.scrape(5);
+  }
+  if (apiID.includes('weather')) {
+    weather.scrape(300);
   }
 }

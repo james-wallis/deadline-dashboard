@@ -38,6 +38,11 @@ create table if not exists dashboard.layout (
   boxId varchar(50)
 ) charset 'utf8mb4';
 
+create table if not exists dashboard.newsApis (
+  id int primary key auto_increment,
+  api varchar(50)
+) charset 'utf8mb4';
+
 insert ignore into dashboard.deadlines values (1, 'webscript', 'Dashboard Coursework', '2017-03-31 00:00:00');
 insert ignore into dashboard.deadlines values (2, 'INSE', 'Final Report and Application', '2017-04-28 00:00:00');
 insert ignore into dashboard.deadlines values (3, 'dummy', 'description', '2017-05-26 00:00:00');
@@ -50,20 +55,20 @@ insert ignore into dashboard.units values (4, 'mathfun', 'Discrete Mathematics a
 insert ignore into dashboard.units values (5, 'dsalg', 'Data Structures and Algorithms', '#F06543');
 insert ignore into dashboard.units values (6, 'adproc', 'Advanced Programming', '#ABE188');
 
-insert ignore into dashboard.apis values (1, 'Four Four Two', 'fourfourtwo-news-div', 1, 0, -1);
+insert ignore into dashboard.apis values (1, 'Four Four Two', 'four-four-two', 1, 0, -1);
 insert ignore into dashboard.apis values (2, 'Current Weather', 'weather-div', 0, 0, -1);
-insert ignore into dashboard.apis values (3, 'The Guardian UK', 'guardian-news-div', 1, 0, -1);
-insert ignore into dashboard.apis values (4, 'Random Quote', 'quote-div', 0, 0, -1);
-insert ignore into dashboard.apis values (5, 'LastFM', 'last-fm-div', 0, 0, -1);
-insert ignore into dashboard.apis values (6, 'BBC News', 'bbc-news-div', 1, 0, -1);
-insert ignore into dashboard.apis values (7, 'Techcrunch', 'tech-crunch-div', 1, 0, -1);
-insert ignore into dashboard.apis values (8, 'BBC Sport', 'bbc-sport-div', 1, 0, -1);
-insert ignore into dashboard.apis values (9, 'Google News', 'google-news-div', 1, 0, -1);
-insert ignore into dashboard.apis values (10, 'Italian Football', 'football-italia-div', 1, 0, -1);
-insert ignore into dashboard.apis values (11, 'Financial Times', 'financial-time-div', 1, 0, -1);
-insert ignore into dashboard.apis values (12, 'The Washington Post', 'washington-post-div', 1, 0, -1);
-insert ignore into dashboard.apis values (13, 'CNN', 'cnn-div', 1, 0, -1);
-insert ignore into dashboard.apis values (14, 'Monzo Balance', 'monzo-balance-div', 0, 0, -1);
+insert ignore into dashboard.apis values (3, 'The Guardian UK', 'the-guardian-uk', 1, 0, -1);
+insert ignore into dashboard.apis values (4, 'LastFM', 'last-fm-div', 0, 0, -1);
+insert ignore into dashboard.apis values (5, 'BBC News', 'bbc-news', 1, 0, -1);
+insert ignore into dashboard.apis values (6, 'Techcrunch', 'techcrunch', 1, 0, -1);
+insert ignore into dashboard.apis values (7, 'BBC Sport', 'bbc-sport', 1, 0, -1);
+insert ignore into dashboard.apis values (8, 'Google News', 'google-news', 1, 0, -1);
+insert ignore into dashboard.apis values (9, 'Italian Football', 'football-italia', 1, 0, -1);
+insert ignore into dashboard.apis values (10, 'Financial Times', 'financial-times', 1, 0, -1);
+insert ignore into dashboard.apis values (11, 'The Washington Post', 'washington-post-div', 1, 0, -1);
+insert ignore into dashboard.apis values (12, 'CNN', 'cnn', 1, 0, -1);
+insert ignore into dashboard.apis values (13, 'Monzo Balance', 'monzo-balance-div', 0, 0, -1);
+insert ignore into dashboard.apis values (14, 'Work Travel Information', 'work-travel-div', 0, 0, -1);
 
 insert ignore into dashboard.layout values (1, '');
 insert ignore into dashboard.layout values (2, '');
@@ -73,3 +78,14 @@ insert ignore into dashboard.layout values (5, '');
 insert ignore into dashboard.layout values (6, '');
 insert ignore into dashboard.layout values (7, '');
 insert ignore into dashboard.layout values (8, '');
+
+insert ignore into dashboard.newsApis values (1, 'bbc-news');
+insert ignore into dashboard.newsApis values (2, 'bbc-sport');
+insert ignore into dashboard.newsApis values (3, 'the-guardian-uk');
+insert ignore into dashboard.newsApis values (4, 'four-four-two');
+insert ignore into dashboard.newsApis values (5, 'techcrunch');
+insert ignore into dashboard.newsApis values (6, 'google-news');
+insert ignore into dashboard.newsApis values (7, 'football-italia');
+insert ignore into dashboard.newsApis values (8, 'financial-times');
+insert ignore into dashboard.newsApis values (9, 'the-washington-post');
+insert ignore into dashboard.newsApis values (10, 'cnn');

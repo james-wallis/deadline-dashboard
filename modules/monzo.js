@@ -36,7 +36,6 @@ function redirectsForSignIn() {
   app.get('/auth/monzo', function(req, res) {
     var url = "https://auth.getmondo.co.uk/?client_id=" + monzoClientID + "&redirect_uri=" +
       monzoRedirectUri + "&response_type=code&state="+ monzoStateToken;
-      console.log(url);
     res.redirect(url);
   });
 
@@ -57,7 +56,6 @@ function redirectsForSignIn() {
           console.log('error exchanging token for access token');
           console.log(err);
         } else {
-          console.log(body);
           body = JSON.parse(body);
           monzoAccessToken = body.access_token;
           monzoRefreshToken = body.refresh_token;
@@ -91,7 +89,7 @@ function getMonzoBalance() {
     monzoBank.balance(monzoAccountId, monzoAccessToken, function(err, value) {
       if (err) {
         if (err.error.code == 'bad_request.missing_param.account_id') {
-          console.log('wor');
+          console.log('No account ID');
         } else {
           console.log('error getting monzo balance');
           console.log(err);
@@ -99,7 +97,6 @@ function getMonzoBalance() {
       } else {
         io.emit('monzoBalance', value);
       }
-      console.log(value);
     });
   }
 }

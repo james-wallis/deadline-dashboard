@@ -458,3 +458,29 @@ main h4 {
   color: #D2D4C8;
 }
 /* Add user styles end */
+
+#work-travel-div {
+  padding: 2% 0;
+}
+
+.googlemaps {
+  text-align: center;
+  color: #3F4045;
+}
+
+.googlemaps-address {
+  font-size: 14px;
+}
+
+.googlemaps-data-container {
+  margin-bottom: 10px;
+}
+
+.googlemaps-header {
+  font-size: 18px;
+}
+
+.googlemaps-data {
+  color: #868784;
+  margin-bottom: 10px;
+}

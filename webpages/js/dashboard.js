@@ -1,48 +1,131 @@
 //Global Variables
-var newsapiKey = 'f8b6dcb74300468589b50a53dca36a4c';
 var numStoriesToShow = 3;
-var intervals = false;
 var apiList;
 //Name used in main greeting
 var userFirstName;
+// Current data from server
+// var currentData = {
+//   news: {},
+//   lastfm: {},
+//   weather: {},
+//   monzo: {
+//     balance: {}
+//   }
+// }
+var currentData = {};
+var pageInitialised = false;
 
 
 
-
-
-
-
-
-
+//Fixed Code
+//Socket.io functions
+socket.on('setupPage', setUpPage);
+socket.on('sessionVariables', setGlobalVariables);
+socket.on('layout', layoutAddIdToBoxes);
+socket.on('apis', loadAPISelectorSettings);
 socket.on('login', createSignUpButton);
+
+// If page is initialised already then the socket.on will run the
+// function directly related to the updated data, if not it will be collected
+// in order to be ready to be added when the page is ready to be populated
+socket.on('timeAndDate', function(timeAndDate) {
+  if (pageInitialised) {
+    showTimeAndDate(timeAndDate);
+  }
+  currentData.timeAndDate = timeAndDate;
+});
+socket.on('lastfmNowPlaying', function(nowPlaying) {
+  if (pageInitialised) {
+    showLastfmNowPlaying(nowPlaying);
+  }
+  currentData.lastfm = nowPlaying;
+});
+
+socket.on('weather', function(weather) {
+  if (pageInitialised) {
+    loadWeatherToDashboard(weather);
+  }
+  currentData.weather = weather;
+});
+
+socket.on('monzoBalance', function(balance) {
+  if (pageInitialised) {
+    showMonzoAccountBalance(balance);
+  }
+  currentData.monzo.balance = balance;
+});
+socket.on('showMonzoLogin', showMonzoLogin);
+
+socket.on('articles', function(articles) {
+  if (pageInitialised) {
+    seperateArticles(articles);
+  }
+  currentData.articles = articles;
+});
+
+socket.on('googlemaps', function(googlemaps) {
+  if (pageInitialised) {
+    seperateGoogleMaps(googlemaps);
+  }
+  currentData.googlemaps = googlemaps;
+});
+
+
+
+
+
+function setUpPage(variables) {
+  setGlobalVariables(variables.session);
+  layoutAddIdToBoxes(variables.activeApis);
+  apiList = variables.apiList;
+  loadAPISelectorSettings(variables.apiList);
+
+  // Run show data when data is present in currentData
+  var checker = setInterval(checkForData, 1);
+  function checkForData() {
+    showData();
+    clearInterval(checker);
+  }
+}
+
+function showData() {
+  data = currentData;
+  if (data !== {}) {
+    console.log(data);
+    if (!!data.monzo) {
+      if (!!data.monzo.balance) {
+        showMonzoAccountBalance(data.monzo.balance);
+      }
+    }
+    if (!!data.lastfm) {
+      showLastfmNowPlaying(data.lastfm);
+    }
+    if (!!data.weather) {
+      loadWeatherToDashboard(data.weather);
+    }
+    if (!!data.timeAndDate) {
+      showTimeAndDate(data.timeAndDate);
+    }
+    if (!!data.articles) {
+      seperateArticles(data.articles);
+    }
+    if(!!data.googlemaps) {
+      seperateGoogleMaps(data.googlemaps);
+    }
+  }
+  pageInitialised = true;
+}
 
 /**
  * Function to add the user details to global variables
  * @param session, contains the user details from the database
  */
 function setGlobalVariables(session) {
-  console.log(session);
-  if(isEmptyObject(session)) {
-    createSignUpButton();
-  } else {
-    userFirstName = session.firstname;
-    document.getElementById('greeting-firstname').textContent = userFirstName;
-    lastfmUser = session.lastfmname;
-    weatherLocation = session.city;
-    greyscale = session.greyscale;
-    //Load API after variables are set
-    loadPageSetIntervals();
-  }
-}
-
-/**
- * Function to check whether an object is empty
- */
-function isEmptyObject(obj) {
-  for (var key in obj) {
-    return false;
-  }
-  return true;
+  userFirstName = session.firstname;
+  document.getElementById('greeting-firstname').textContent = userFirstName;
+  lastfmUser = session.lastfmname;
+  weatherLocation = session.city;
+  greyscale = session.greyscale;
 }
 
 /**
@@ -78,195 +161,37 @@ function createSignUpButton() {
 
 }
 
-/**
- * function to load all api's and set intervals for their refresh
- */
-function loadPageSetIntervals() {
-  getNews();
-  // getRandQuote();
-  updateDateTime();
-  if (!intervals) {
-    setInterval(getRandQuote, 300000);
-    setInterval(getNews, 300000);
-    intervals = true;
-  }
-}
-
-/**
- * Function to get all news apis from newsAPI.org
- */
-function getNews() {
-  getBBCNews();
-  getBBCSport();
-  getFourFourTwoNews();
-  getTechCrunchNews();
-  getGuardianNews();
-  // getGoogleNews();
-  // getItalianFootballNews();
-  // getFinancialTimesNews();
-  // getWashingtonPostNews();
-  // getCNNNews();
-}
-
-/**
- * Function to get the BBC News from newsAPI.org
- */
-function getBBCNews() {
-  getNewsApi('bbc-news', 'bbc-news-div');
-}
-
-/**
- * Function to get the BBC Sport from newsAPI.org
- */
-function getBBCSport() {
-  getNewsApi('bbc-sport', 'bbc-sport-div');
-}
-
-/**
- * Function to get the guardian from newsAPI.org
- */
-function getGuardianNews() {
-  getNewsApi('the-guardian-uk', 'guardian-news-div');
-}
-
-/**
- * Function to get the FourFourTwo from newsAPI.org
- */
-function getFourFourTwoNews() {
-  getNewsApi('four-four-two', 'fourfourtwo-news-div');
-}
-
-/**
- * Function to get the tech crunch News from newsAPI.org
- */
-function getTechCrunchNews() {
-  getNewsApi('techcrunch', 'tech-crunch-div');
-}
-
-/**
- * Function to get the google news from newsAPI.org
- */
-function getGoogleNews() {
-  getNewsApi('google-news', 'google-news-div');
-}
-
-/**
- * Function to get the italian football news from newsAPI.org
- */
-function getItalianFootballNews() {
-  getNewsApi('football-italia', 'football-italia-div');
-}
-
-/**
- * Function to get the financial-times news from newsAPI.org
- */
-function getFinancialTimesNews() {
-  getNewsApi('financial-times', 'financial-time-div');
-}
-
-/**
- * Function to get the washington post from newsAPI.org
- */
-function getWashingtonPostNews() {
-  getNewsApi('the-washington-post', 'washington-post-div');
-}
-
-/**
- * Function to get the CNN News from newsAPI.org
- */
-function getCNNNews() {
-  getNewsApi('cnn', 'cnn-div');
-}
-
-/**
- * Function to get news from newsAPI.org
- * @param the newsSource, needed to load the api
- * @param the divId, the id of the div to load the data to
- */
-function getNewsApi(newsSource, divId) {
-  var url = 'https://newsapi.org/v1/articles?source='+newsSource+
-            '&sortBy=top&apiKey='+newsapiKey;
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      loadNewsToDashboard((JSON.parse(xhr.responseText)), divId);
-    } else {
-      console.error('error getting news', xhr);
-    document.getElementById('news-div').innerHTML =
-    'Sorry, there has been an error getting your news';
+function seperateArticles(articles) {
+  for (var i = 0; i < articles.length; i++) {
+    if (!!document.getElementById(articles[i].source)) {
+      loadNewsToDashboard(articles[i]);
     }
   }
-  xhr.send();
 }
 
 /**
  * Function to load the news to the dashboard
- * @param news, the list of news articles from newsAPI.org
+ * @param articles, the list of news articles from newsAPI.org
  * @param divId, the id of the div to load the news articles to
  */
-function loadNewsToDashboard(news, divId) {
-  var newsDiv = document.getElementById(divId);
+function loadNewsToDashboard(article) {
+  var newsDiv = document.getElementById(article.source);
   newsDiv.classList.add('news-div');
   newsDiv.innerHTML = '';
 
   var h = document.createElement('h4');
-  var title = news.source.replace(/-/g, ' ');
+  var title = article.source.replace(/-/g, ' ');
   h.textContent = title;
   // h.textContent = news.articles[0].author;
   newsDiv.appendChild(h);
   var newsCounter = 0;
   while (newsCounter < numStoriesToShow) {
-    var article = news.articles[newsCounter];
+    var story = article.articles[newsCounter];
     var el = document.createElement('p');
-    el.textContent = article.title;
+    el.textContent = story.title;
     newsDiv.appendChild(el);
     newsCounter++;
   }
-}
-
-
-
-
-
-
-/**
- * Function to get a random quote
- */
-function getRandQuote() {
-  var xhr = new XMLHttpRequest();
-  var url = 'http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1;'
-  xhr.open('GET', url, true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      loadQuoteToDashboard(JSON.parse(xhr.responseText));
-    } else {
-      console.error('error getting last fm data', xhr);
-    document.getElementById('quote-div').innerHTML =
-    'Sorry, there has been an error getting your quote';
-    }
-  }
-  xhr.send();
-}
-
-/**
- * Function to add a random quote to the dashboard
- */
-function loadQuoteToDashboard(quote) {
-  var quoteDiv = document.getElementById('quote-div');
-  quoteDiv.innerHTML = '';
-
-  var h = document.createElement('h4');
-  h.textContent = 'Random Quote';
-  quoteDiv.appendChild(h);
-
-  var div = document.createElement('div');
-  div.innerHTML = quote[0].content;
-  quoteDiv.appendChild(div);
-
-  var el = document.createElement('p');
-  el.textContent = quote[0].title;
-  div.appendChild(el);
 }
 
 
@@ -277,7 +202,6 @@ function loadQuoteToDashboard(quote) {
  */
 function loadAPISelectorSettings(list) {
   apiList = list;
-  console.log(apiList);
   var contentSelector = document.getElementById('contentSelector');
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   contentSelector.innerHTML = '';
@@ -339,7 +263,6 @@ function updateBoxApi(e) {
   }
   boxNo = parseInt(boxNo)+1;
   updateLayoutTable((boxNo), box.id);
-  loadPageSetIntervals();
 }
 
 
@@ -348,9 +271,8 @@ function updateBoxApi(e) {
  * Function to add the correct id to the correct box to display api's
  */
 function layoutAddIdToBoxes(list) {
-  console.log(list);
   var boxes = document.getElementsByClassName('dashboard-inner-box');
-  for (var i = 0; i < list.length; i++) {
+  for (var i = 0; i < boxes.length; i++) {
     for (var j = 0; j < list.length; j++) {
       if (list[j].boxNo === (i+1)) {
         boxes[i].id = list[j].htmlid;
@@ -360,45 +282,42 @@ function layoutAddIdToBoxes(list) {
 }
 
 
+/**
+ * Function to update the layout table with the new layout of the dashboard
+ */
+function updateLayoutTable(boxNo, boxId) {
+  var json = {
+    oldApi: '',
+    newApi: '',
+    newApiBoxNo: ''
+  };
+  // Set current box to unactive
+  for (var i = 0; i < apiList.length; i++) {
+    if (apiList[i].boxNo == boxNo) {
+      apiList[i].activeApi = 0;
+      apiList[i].boxNo = -1;
+      json.oldApi = apiList[i];
+    }
+  }
+  // Set new box to active
+  for (var i = 0; i < apiList.length; i++) {
+    if (apiList[i].htmlid == boxId) {
+      apiList[i].activeApi = 1;
+      apiList[i].boxNo = boxNo;
+      json.newApi = apiList[i];
+    }
+  }
+  // json = JSON.stringify(json);
+  socket.emit('updateLayout', json);
+  socket.emit('updateApiList', apiList);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Fixed Code
-//Socket.io functions
-socket.on('sessionVariables', setGlobalVariables);
-socket.on('layout', layoutAddIdToBoxes);
-socket.on('apis', loadAPISelectorSettings);
-socket.on('lastfmNowPlaying', showLastfmNowPlaying);
-socket.on('weather', loadWeatherToDashboard);
-socket.on('monzoBalance', showMonzoAccountBalance);
-socket.on('showMonzoLogin', showMonzoLogin);
-
-
-
-
+function showTimeAndDate(json) {
+  document.getElementById('currentTime').textContent = json.time;
+  document.getElementById('timeOfDay').textContent = json.timeOfDay;
+  document.getElementById('dayOfTheWeek').textContent = json.day;
+  document.getElementById('dateMonth').textContent = json.date;
+}
 
 
 /**
@@ -431,7 +350,6 @@ function showMonzoLogin() {
  */
 function showMonzoAccountBalance(json) {
   // json = JSON.parse(json);
-  console.log(json);
   var balance = (json.balance/100).toFixed(2);
   var spendToday = (json.spend_today/100).toFixed(2);
   spendToday = spendToday.substr(1);
@@ -540,170 +458,77 @@ function loadWeatherToDashboard(weather) {
   // div.appendChild(el);
 }
 
-/**
- * Function to update the layout table with the new layout of the dashboard
- */
-function updateLayoutTable(boxNo, boxId) {
-  var json = {
-    oldApi: '',
-    newApi: '',
-    newApiBoxNo: ''
-  };
-  console.log(apiList);
-  // Set current box to unactive
-  for (var i = 0; i < apiList.length; i++) {
-    if (apiList[i].boxNo == boxNo) {
-      apiList[i].activeApi = 0;
-      apiList[i].boxNo = -1;
-      json.oldApi = apiList[i];
+function seperateGoogleMaps(googlemaps) {
+  if (!!googlemaps.directions) {
+    var directions = googlemaps.directions;
+    if (!!directions.work) {
+      displayWorkTravelTime(directions.work);
     }
   }
-  // Set new box to active
-  for (var i = 0; i < apiList.length; i++) {
-    if (apiList[i].htmlid == boxId) {
-      apiList[i].activeApi = 1;
-      apiList[i].boxNo = boxNo;
-      json.newApi = apiList[i];
-    }
-  }
-  console.log(apiList);
-  console.log(json);
-  // json = JSON.stringify(json);
-  socket.emit('updateLayout', json);
-  socket.emit('updateApiList', apiList);
 }
 
+function displayWorkTravelTime(data) {
+  console.log(data);
+  var container = document.getElementById('work-travel-div');
+  container.innerHTML = '';
+  var h = document.createElement('h4');
+  h.textContent = 'Travel Information';
+  container.appendChild(h);
+
+  var googlemaps = document.createElement('div');
+  googlemaps.classList.add('googlemaps');
+  container.appendChild(googlemaps);
+
+  var origin = data.origin;
+  var destination = data.destination;
 
 
+  var googlemapsData = document.createElement('div');
+  googlemapsData.classList.add('googlemaps-data-container');
+  googlemaps.appendChild(googlemapsData);
 
+  h = document.createElement('h5');
+  h.classList.add('googlemaps-header');
+  h.textContent = 'Duration';
+  googlemapsData.appendChild(h);
 
+  var p = document.createElement('p');
+  p.classList.add('googlemaps-data');
+  p.textContent = data.duration.text;
+  googlemapsData.appendChild(p);
 
+  h = document.createElement('h5');
+  h.classList.add('googlemaps-header');
+  h.textContent = 'Time in Traffic';
+  googlemapsData.appendChild(h);
 
+  p = document.createElement('p');
+  p.classList.add('googlemaps-data');
+  p.textContent = data.duration_in_traffic.text;
+  googlemapsData.appendChild(p);
 
+  h = document.createElement('h5');
+  h.classList.add('googlemaps-header');
+  h.textContent = 'Distance';
+  googlemapsData.appendChild(h);
 
+  p = document.createElement('p');
+  p.classList.add('googlemaps-data');
+  p.textContent = data.distance.text;
+  googlemapsData.appendChild(p);
 
+  p = document.createElement('p');
+  p.classList.add('googlemaps-address');
+  p.textContent = origin;
+  googlemaps.appendChild(p);
 
+  p = document.createElement('p');
+  p.classList.add('googlemaps-address');
+  p.textContent = 'to';
+  googlemaps.appendChild(p);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Time functions for the dashboard
- * These were meant to be exported but I ran out of time so they are here
- * After coureswork submission this will be changed so that they are exported
- */
-
-var timerSet = false;
-
-/**
- * Function to update the date and time on the dashboard
- */
-function updateDateTime() {
-  var date = new Date();
-  showCurrentTime(date);
-  showTimeOfDay(date);
-  showDayOfTheWeek(date);
-  showDateMonth(date);
-  if (!timerSet) {
-    setInterval(updateDateTime, 1000);
-    timerSet = true;
-  }
-}
-/**
- * Function to show the current time on the dashboard
- * @param date, the date for the dashboard
- */
-function showCurrentTime(date) {
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var ampm = hours >= 12 ? ' PM' : ' AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    minutes = minutes < 10 ? '0'+minutes : minutes;
-    var stringTime = hours + ':' + minutes + ' ' + ampm;
-    document.getElementById('currentTime').textContent = stringTime;
-}
-
-/**
- * Function to show the current time of day on the dashboard
- * @param date, the date for the dashboard
- */
-function showTimeOfDay(date) {
-  var hours = date.getHours();
-  var timeOfDay;
-  if (hours < 12) {
-    timeOfDay = "Good Morning";
-  }
-  else if (hours < 18) {
-    timeOfDay = "Good Afternoon"
-  }
-  else {
-    timeOfDay = "Good Evening"
-  }
-  document.getElementById('timeOfDay').textContent = timeOfDay;
-}
-
-/**
- * Function to show the day of the week on the dashboard
- * @param date, the date for the dashboard
- */
-function showDayOfTheWeek(date) {
-  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  var day = days[ date.getDay() ];
-  document.getElementById('dayOfTheWeek').textContent = day;
-}
-
-/**
- * Function to show the month on the dashboard
- * @param date, the date for the dashboard
- */
-function showDateMonth(date) {
-  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var month = months[ date.getMonth() ];
-  var formattedDate = (date.getDate()+formatDate(date.getDate));
-  document.getElementById('dateMonth').textContent = (formattedDate + " " + month);
-}
-
-/**
- * Function to format the date so that it has the correct ending
- * @param date, the date for the dashboard
- */
-function formatDate(date) {
-  if(date>3 && date<21) return 'th';
-  switch (date % 10) {
-        case 1:  return "st";
-        case 2:  return "nd";
-        case 3:  return "rd";
-        default: return "th";
-    }
+  p = document.createElement('p');
+  p.classList.add('googlemaps-address');
+  p.textContent = destination;
+  googlemaps.appendChild(p);
 }
