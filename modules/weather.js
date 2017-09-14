@@ -69,7 +69,8 @@ function getLocation() {
 //Export functions
 module.exports = {
   passGlobals: passGlobals,
-  scrape, scrape,
+  scrape: scrape,
+  stop: stop,
   get: getWeather,
   send: sendWeather,
   setLocation: setLocation,

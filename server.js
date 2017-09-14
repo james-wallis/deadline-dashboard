@@ -131,7 +131,7 @@ function setUpPage() {
       apiList: apiList,
       activeApis: activeApis
     }
-    io.emit('setupPage', payload);
+    io.emit('variables', payload);
   } else {
     io.emit('login');
   }
@@ -189,16 +189,25 @@ function startScrape() {
  * Called when one api is changed in the settings menu
  */
 function updateLayout(json) {
+  var countQueriesRun = 0;
   if (json.oldApi !== '') {
     sql.query('UPDATE apis SET activeApi = 0, boxNo = -1 WHERE apiId = ?', [json.oldApi.htmlid], function(err) {
       if (err) console.log("Error inserting");
+      countQueriesRun++;
+      if (countQueriesRun == 2) {
+        getApis(true);
+      }
     });
     stopApi(json.oldApi);
   }
   sql.query('UPDATE apis SET activeApi = 1, boxNo = ? WHERE apiId = ?', [json.newApi.boxNo, json.newApi.htmlid], function(err) {
     if (err) console.log("Error inserting" + err);
+    countQueriesRun++;
+    if (countQueriesRun == 2) {
+      getApis(true);
+    }
   });
-  activateApi(json.newApi);
+  // activateApi(json.newApi);
 }
 
 function updateApiList(list) {
@@ -214,7 +223,7 @@ function updateApiList(list) {
  * Function to send the list of apis
  * @return the list of apis
  */
-function getApis() {
+function getApis(sendApisBool = false) {
   var tempApiList = [];
   // prepare query
   var query = 'SELECT id, apiName, apiId, fromNewsApi, activeApi, boxNo FROM apis';
@@ -232,8 +241,11 @@ function getApis() {
       });
     });
     apiList = tempApiList;
-    figureActive();
+    figureActive(sendApisBool);
   });
+  if (sendApisBool) {
+    sendApis();
+  }
 }
 
 function sendApis() {
@@ -244,7 +256,7 @@ function sendApis() {
  * Function to get the saved layout of the dashboard
  * Used to add each id to the dashboard
  */
-function figureActive() {
+function figureActive(sendApisBool = false) {
   var list = apiList;
   var active = [];
   for (var i = 0; i < list.length; i++) {
@@ -253,11 +265,20 @@ function figureActive() {
     }
   }
   activeApis = active;
+  if (sendApisBool) {
+    activateAll(active, sendUpdatedLayoutAndApis);
+  }
   activateAll(active);
 }
 
 function sendLayout() {
   io.emit('layout', activeApis);
+}
+
+function sendUpdatedLayoutAndApis() {
+  io.emit('apis', apiList);
+  io.emit('layout', activeApis);
+  io.emit('refreshPage');
 }
 
 
@@ -290,9 +311,13 @@ function addUser(json) {
 }
 
 // Activate all apis that are active
-function activateAll(list) {
+function activateAll(list, cb) {
   for (var i = 0; i < list.length; i++) {
     activateApi(list[i]);
+    if (!!cb && i+1===list.length) {
+      cb();
+      console.log('callback');
+    }
   }
 }
 

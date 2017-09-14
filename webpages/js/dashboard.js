@@ -19,11 +19,12 @@ var pageInitialised = false;
 
 //Fixed Code
 //Socket.io functions
-socket.on('setupPage', setUpPage);
+socket.on('variables', setUpPage);
 socket.on('sessionVariables', setGlobalVariables);
 socket.on('layout', layoutAddIdToBoxes);
 socket.on('apis', loadAPISelectorSettings);
 socket.on('login', createSignUpButton);
+socket.on('refreshPage', showData);
 
 // If page is initialised already then the socket.on will run the
 // function directly related to the updated data, if not it will be collected
@@ -75,7 +76,9 @@ socket.on('googlemaps', function(googlemaps) {
 
 
 function setUpPage(variables) {
-  setGlobalVariables(variables.session);
+  if (!!variables.session) {
+    setGlobalVariables(variables.session);
+  }
   layoutAddIdToBoxes(variables.activeApis);
   apiList = variables.apiList;
   loadAPISelectorSettings(variables.apiList);
@@ -201,6 +204,7 @@ function loadNewsToDashboard(article) {
  * @param apiList, the list of available api's
  */
 function loadAPISelectorSettings(list) {
+  console.log(list);
   apiList = list;
   var contentSelector = document.getElementById('contentSelector');
   var boxes = document.getElementsByClassName('dashboard-inner-box');
@@ -271,6 +275,7 @@ function updateBoxApi(e) {
  * Function to add the correct id to the correct box to display api's
  */
 function layoutAddIdToBoxes(list) {
+  console.log(list);
   var boxes = document.getElementsByClassName('dashboard-inner-box');
   for (var i = 0; i < boxes.length; i++) {
     for (var j = 0; j < list.length; j++) {
