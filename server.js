@@ -90,7 +90,7 @@ io.on('connection', function(socket){
   weather.send();
   monzo.balance();
   news.send();
-  googlemaps.sendWork();
+  googlemaps.send();
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });

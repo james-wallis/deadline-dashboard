@@ -466,27 +466,55 @@ function loadWeatherToDashboard(weather) {
 function seperateGoogleMaps(googlemaps) {
   if (!!googlemaps.directions) {
     var directions = googlemaps.directions;
-    if (!!directions.work) {
-      displayWorkTravelTime(directions.work);
+    if (!!directions.home_work) {
+      displayWorkTravelTime(directions.home_work);
+    }
+    if (!!directions.work_home) {
+      displayHomeTravelTime(directions.work_home);
     }
   }
 }
 
 function displayWorkTravelTime(data) {
   console.log(data);
-  var container = document.getElementById('work-travel-div');
+  var container = document.getElementById('home-work-travel-div');
+  if (!!container) {
+    var tripdesc = 'Home to Work';
+    var duration = data.duration.text;
+    var durationTraffic = data.duration_in_traffic.text;
+    var distance = data.distance.text;
+    googleMapsGeneric(container, tripdesc, duration, durationTraffic, distance);
+  }
+}
+
+function displayHomeTravelTime(data) {
+  console.log(data);
+  var container = document.getElementById('work-home-travel-div');
+  if (!!container) {
+    var tripdesc = 'Work to Home';
+    var duration = data.duration.text;
+    var durationTraffic = data.duration_in_traffic.text;
+    var distance = data.distance.text;
+    googleMapsGeneric(container, tripdesc, duration, durationTraffic, distance);
+  }
+}
+
+
+function googleMapsGeneric(container, tripdesc, duration, durationTraffic, distance) {
   container.innerHTML = '';
   var h = document.createElement('h4');
+  h.classList.add('google-travel-div-h4');
   h.textContent = 'Travel Information';
+  container.appendChild(h);
+
+  h = document.createElement('h5');
+  h.classList.add('google-travel-div-h5');
+  h.textContent = tripdesc;
   container.appendChild(h);
 
   var googlemaps = document.createElement('div');
   googlemaps.classList.add('googlemaps');
   container.appendChild(googlemaps);
-
-  var origin = data.origin;
-  var destination = data.destination;
-
 
   var googlemapsData = document.createElement('div');
   googlemapsData.classList.add('googlemaps-data-container');
@@ -499,7 +527,7 @@ function displayWorkTravelTime(data) {
 
   var p = document.createElement('p');
   p.classList.add('googlemaps-data');
-  p.textContent = data.duration.text;
+  p.textContent = duration;
   googlemapsData.appendChild(p);
 
   h = document.createElement('h5');
@@ -509,7 +537,7 @@ function displayWorkTravelTime(data) {
 
   p = document.createElement('p');
   p.classList.add('googlemaps-data');
-  p.textContent = data.duration_in_traffic.text;
+  p.textContent = durationTraffic;
   googlemapsData.appendChild(p);
 
   h = document.createElement('h5');
@@ -519,21 +547,8 @@ function displayWorkTravelTime(data) {
 
   p = document.createElement('p');
   p.classList.add('googlemaps-data');
-  p.textContent = data.distance.text;
+  p.textContent = distance;
   googlemapsData.appendChild(p);
 
-  p = document.createElement('p');
-  p.classList.add('googlemaps-address');
-  p.textContent = origin;
-  googlemaps.appendChild(p);
 
-  p = document.createElement('p');
-  p.classList.add('googlemaps-address');
-  p.textContent = 'to';
-  googlemaps.appendChild(p);
-
-  p = document.createElement('p');
-  p.classList.add('googlemaps-address');
-  p.textContent = destination;
-  googlemaps.appendChild(p);
 }
