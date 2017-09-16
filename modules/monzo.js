@@ -60,12 +60,41 @@ function redirectsForSignIn() {
           monzoAccessToken = body.access_token;
           monzoRefreshToken = body.refresh_token;
           monzoUserId = body.user_id;
+          console.log(body.expires_in);
           getMonzoAccount();
+          setRefreshTimer();
           res.redirect("/");
         }
       });
     }
   });
+}
+
+function refreshAccess() {
+  var json = { grant_type: 'refresh_token',
+                client_id: monzoClientID,
+                client_secret: monzoSecretToken,
+                refresh_token: monzoRefreshToken
+              };
+  request.post({url:'https://api.monzo.com/oauth2/token', form: json}, function(err,httpResponse,body) {
+    if (err) {
+      console.log('error refreshing access token');
+      console.log(err);
+    } else {
+      body = JSON.parse(body);
+      monzoAccessToken = body.access_token;
+      monzoRefreshToken = body.refresh_token;
+      monzoUserId = body.user_id;
+      console.log(body.expires_in);
+      getMonzoAccount();
+      res.redirect("/");
+    }
+  });
+}
+
+function setRefreshTimer(time = 18000) {
+  seconds = time * 1000;
+  setInterval(refreshAccess, seconds);
 }
 
 function getMonzoAccount() {
@@ -90,11 +119,16 @@ function getMonzoBalance() {
       if (err) {
         if (err.error.code == 'bad_request.missing_param.account_id') {
           console.log('No account ID');
-        } else {
+        } else if (err.error.code == 'unauthorized.bad_access_token'){
+          console.log('Access token expired');
+          io.emit('showMonzoLogin');
+        }
+          else {
           console.log('error getting monzo balance');
           console.log(err);
         }
       } else {
+        console.log(value);
         io.emit('monzoBalance', value);
       }
     });
