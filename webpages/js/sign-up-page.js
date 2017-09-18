@@ -30,6 +30,7 @@ function addUser(e) {
           time = document.getElementById('time').checked,
           greyscale = document.getElementById('greyscale').checked;
           console.log(firstname);
+<<<<<<< HEAD:webpages/sign-up-page.js
       var url = '/api/addUser';
       var http = new XMLHttpRequest();
       console.log(url);
@@ -41,14 +42,18 @@ function addUser(e) {
         }
       };
       http.send(JSON.stringify({
+=======
+      var json = JSON.stringify({
+>>>>>>> socketio:webpages/js/sign-up-page.js
           firstname: firstname,
           lastname: lastname,
           lastfm: lastfmname,
           city: city,
           time: time,
           greyscale: greyscale
-        }
-    ));
+        });
+      socket.emit('newUser', json);
+      introduction(firstname);
     } else {
       swal("Cancelled", "Your details have not been added", "error");
     }
@@ -93,7 +98,7 @@ function introduction(firstname) {
   div.appendChild(el);
 
   el = document.createElement('img');
-  el.setAttribute('src', '/img/menu.gif');
+  el.setAttribute('src', 'img/menu.gif');
   el.setAttribute('alt', 'Gif showing the menu');
   div.appendChild(el);
 
