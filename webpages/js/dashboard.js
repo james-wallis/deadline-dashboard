@@ -3,21 +3,9 @@ var numStoriesToShow = 3;
 var apiList;
 //Name used in main greeting
 var userFirstName;
-// Current data from server
-// var currentData = {
-//   news: {},
-//   lastfm: {},
-//   weather: {},
-//   monzo: {
-//     balance: {}
-//   }
-// }
 var currentData = {};
 var pageInitialised = false;
 
-
-
-//Fixed Code
 //Socket.io functions
 socket.on('variables', setUpPage);
 socket.on('sessionVariables', setGlobalVariables);
@@ -62,6 +50,7 @@ socket.on('articles', function(articles) {
     seperateArticles(articles);
   }
   currentData.articles = articles;
+  console.log(articles);
 });
 
 socket.on('googlemaps', function(googlemaps) {

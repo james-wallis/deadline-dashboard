@@ -2,3 +2,5 @@
 node_modules/
 sql_config.json
 .env
+Flatify/
+newWebpages/
