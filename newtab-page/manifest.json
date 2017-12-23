@@ -1,0 +1,11 @@
+{
+"name":"Deadline Tracker",
+"description":"This chrome extension is built to track my personal deadlines, it uses my website in an iframe to run.",
+"version":"1.0.0",
+"manifest_version":2,
+
+
+  "chrome_url_overrides" : {
+    "newtab": "newtab.html"
+  }
+}
